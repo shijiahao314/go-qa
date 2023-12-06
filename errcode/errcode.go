@@ -7,16 +7,21 @@ const (
 	// common
 	ParamParseFailed = 10
 	RoleMismatch     = 11
+)
 
-	// auth
-	LoginFailed   = 100
-	UsernameOrPwd = 101
-	SessionSave   = 102
-	NotLogin      = 103
+// auth
+const (
+	SignupFailed = 100 + iota
+	LoginFailed
+	UsernameOrPwd
+	SessionSave
+	NotLogin
+)
 
-	// user
-	GetUsersFailed   = 200
-	UpdateUserFailed = 201
-	DeleteUserFailed = 202
-	AddUserFailed    = 203
+// user
+const (
+	GetUsersFailed = 200 + iota
+	UpdateUserFailed
+	DeleteUserFailed
+	AddUserFailed
 )

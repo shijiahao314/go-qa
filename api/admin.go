@@ -51,7 +51,7 @@ func (aa *AdminApi) GetUsers(c *gin.Context) {
 	var usersInfos []model.UserInfo
 	for _, u := range users {
 		usersInfos = append(usersInfos, model.UserInfo{
-			ID:       u.ID,
+			UserID:   u.UserID,
 			Username: u.Username,
 			Role:     u.Role,
 		})
@@ -81,7 +81,7 @@ func (aa *AdminApi) UpdateUser(c *gin.Context) {
 	}
 
 	u := model.User{}
-	u.ID = uint(id)
+	u.UserID = uint64(id)
 	u.Password = req.Password
 	u.Role = req.Role
 

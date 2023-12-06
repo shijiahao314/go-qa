@@ -21,7 +21,7 @@ func InitRouter() *gin.Engine {
 
 	// session
 	store, err := redis.NewStore(
-		10,
+		global.Config.Redis.ConnectionNum,
 		"tcp",
 		global.Config.Redis.Addr,
 		global.Config.Redis.Password,

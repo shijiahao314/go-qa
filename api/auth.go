@@ -19,6 +19,47 @@ type LoginReq struct {
 	Password string `json:"password"`
 }
 
+// signup
+func (aa *AuthApi) SignUp(c *gin.Context) {
+	type SignUpReq struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Role     string `json:"Role"`
+	}
+
+	req := SignUpReq{}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code": errcode.SignupFailed,
+			"msg":  err.Error(),
+		})
+		global.Logger.Info("invalid request", zap.Error(err))
+		return
+	}
+
+	u := model.User{
+		Username: req.Username,
+		Password: req.Password,
+		Role:     req.Role,
+	}
+	us := new(service.UserService)
+	if err := us.AddUser(u); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": errcode.AddUserFailed,
+			"msg":  err.Error(),
+		})
+		global.Logger.Info("failed to add user", zap.Error(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "success",
+	})
+	global.Logger.Info("success add user", zap.String("username", u.Username))
+}
+
+// login
 func (aa *AuthApi) Login(c *gin.Context) {
 	session := sessions.Default(c)
 	if uinfo, ok := session.Get(global.USER_INFO_KEY).(model.UserInfo); ok {
@@ -52,7 +93,7 @@ func (aa *AuthApi) Login(c *gin.Context) {
 	}
 
 	userInfo := model.UserInfo{
-		ID:       user.ID,
+		UserID:   user.UserID,
 		Username: user.Username,
 		Role:     user.Role,
 	}

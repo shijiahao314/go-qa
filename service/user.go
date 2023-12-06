@@ -5,6 +5,7 @@ import (
 
 	"github.com/TravisRoad/gomarkit/global"
 	"github.com/TravisRoad/gomarkit/model"
+	snowflake "github.com/TravisRoad/gomarkit/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -44,10 +45,19 @@ func (us *UserService) AddUser(u model.User) error {
 	if err != nil {
 		return fmt.Errorf("bcrypt generate error: %w", err)
 	}
+
 	user := model.User{
+		UserID:   snowflake.GetSnowflakeID(),
 		Username: u.Username,
 		Password: string(hashedPass),
-		Role:     global.ROLE_USER,
+	}
+	switch u.Role {
+	case global.ROLE_ADMIN:
+		user.Role = global.ROLE_ADMIN
+	case global.ROLE_USER:
+		user.Role = global.ROLE_USER
+	default:
+		return fmt.Errorf("invalid role type: %s", u.Role)
 	}
 
 	var cnt int64
@@ -57,7 +67,7 @@ func (us *UserService) AddUser(u model.User) error {
 		return err
 	}
 	if cnt > 0 {
-		return fmt.Errorf("user already exists")
+		return fmt.Errorf("user %s already exists", u.Username)
 	}
 	if err := tx.Model(&model.User{}).Create(&user).Error; err != nil {
 		tx.Rollback()
@@ -79,7 +89,7 @@ func (us *UserService) UpdateUser(u model.User) error {
 	var user model.User
 	tx := global.DB.Begin()
 
-	if err := tx.Model(&model.User{}).Where("id = ?", u.ID).Take(&user).Error; err != nil {
+	if err := tx.Model(&model.User{}).Where("id = ?", u.UserID).Take(&user).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -95,7 +105,7 @@ func (us *UserService) UpdateUser(u model.User) error {
 		user.Role = u.Role
 	}
 
-	if err := tx.Model(&model.User{}).Where("id = ?", u.ID).Save(&user).Error; err != nil {
+	if err := tx.Model(&model.User{}).Where("id = ?", u.UserID).Save(&user).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

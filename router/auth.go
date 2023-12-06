@@ -11,9 +11,8 @@ func (*AuthRouter) Register(r *gin.RouterGroup) {
 	rt := r.Group("/auth")
 	authApi := &api.AuthApi{}
 
-	{
-		rt.POST("/login", authApi.Login)
-		rt.POST("/logout", authApi.Logout)
-		rt.GET("/islogin", authApi.IsLogin)
-	}
+	rt.POST("/signup", authApi.SignUp)
+	rt.POST("/login", authApi.Login)
+	rt.POST("/logout", authApi.Logout)
+	rt.GET("/islogin", authApi.IsLogin)
 }
