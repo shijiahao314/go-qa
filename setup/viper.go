@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"os"
 	"path/filepath"
 	"runtime"
 
@@ -17,21 +18,38 @@ const (
 	PROD_CONFIG_FILE = "config.prod.yaml"
 )
 
+func InitMode() {
+	mode, ok := os.LookupEnv("MODE")
+	if ok {
+		switch mode {
+		case global.TEST:
+			global.Mode = global.TEST
+		case global.DEV:
+			global.Mode = global.DEV
+		case global.PROD:
+			global.Mode = global.PROD
+		}
+	} else {
+		global.Mode = global.DEFAULT_MODE
+	}
+}
+
 func InitViper() {
-	mode := helper.Mode()
+	InitMode()
+	mode := helper.GetMode()
 
 	v := viper.New()
 	configFile := DEV_CONFIG_FILE
 
 	switch mode {
-	case global.DEV:
-		gin.SetMode(gin.DebugMode)
-		configFile = DEV_CONFIG_FILE
 	case global.TEST:
 		gin.SetMode(gin.TestMode)
 		_, b, _, _ := runtime.Caller(0)
 		path := filepath.Dir(filepath.Dir(b))
 		configFile = filepath.Join(path, DEV_CONFIG_FILE)
+	case global.DEV:
+		gin.SetMode(gin.DebugMode)
+		configFile = DEV_CONFIG_FILE
 	case global.PROD:
 		gin.SetMode(gin.ReleaseMode)
 		configFile = PROD_CONFIG_FILE

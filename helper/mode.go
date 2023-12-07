@@ -1,11 +1,9 @@
 package helper
 
-import "os"
+import (
+	"github.com/TravisRoad/gomarkit/global"
+)
 
-func Mode() string {
-	mode, ok := os.LookupEnv("MODE")
-	if !ok {
-		mode = "DEV"
-	}
-	return mode
+func GetMode() string {
+	return string(global.Mode)
 }

@@ -3,7 +3,10 @@ package setup
 import (
 	"os"
 
+	"github.com/TravisRoad/gomarkit/global"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 func PathExists(path string) (bool, error) {
@@ -18,9 +21,36 @@ func PathExists(path string) (bool, error) {
 }
 
 func initZap() *zap.Logger {
-	logger, err := zap.NewDevelopment(zap.AddCaller())
-	if err != nil {
-		panic(err)
+	var encoderConfig zapcore.EncoderConfig
+	switch global.Mode {
+	case global.DEV:
+		encoderConfig = zap.NewDevelopmentEncoderConfig()
+	case global.PROD:
+		encoderConfig = zap.NewProductionEncoderConfig()
+	default:
+		encoderConfig = zap.NewDevelopmentEncoderConfig()
 	}
+	// output1: file
+	fileCore := zapcore.NewCore(
+		zapcore.NewJSONEncoder(encoderConfig),
+		zapcore.AddSync(&lumberjack.Logger{
+			Filename:   "./logs/tmp.log",
+			MaxSize:    500, // megabytes
+			MaxBackups: 3,
+			MaxAge:     28, // days
+		}),
+		zap.InfoLevel,
+	)
+	// output2: console
+	consoleCore := zapcore.NewCore(
+		zapcore.NewConsoleEncoder(encoderConfig),
+		zapcore.Lock(os.Stdout),
+		zapcore.DebugLevel,
+	)
+	logger := zap.New(zapcore.NewTee(fileCore, consoleCore))
+	// logger, err := zap.NewDevelopment(zap.AddCaller())
+	// if err != nil {
+	// 	panic(err)
+	// }
 	return logger
 }

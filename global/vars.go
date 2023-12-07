@@ -7,17 +7,23 @@ import (
 	"gorm.io/gorm"
 )
 
+// ModeType
+type ModeType string
+
 const (
 	TEST = "TEST"
 	DEV  = "DEV"
 	PROD = "PROD"
 )
+const DEFAULT_MODE = DEV
 
+// vars
 var (
 	Config *config.Config
 	DB     *gorm.DB
 	Logger *zap.Logger
 	Redis  *redis.Client
+	Mode   ModeType
 )
 
 const (

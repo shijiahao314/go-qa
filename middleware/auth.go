@@ -33,7 +33,7 @@ func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		uinfo, ok := session.Get(global.USER_INFO_KEY).(map[string]interface{})
-		mode := helper.Mode()
+		mode := helper.GetMode()
 
 		// if debug mode on
 		if debug := c.Query("debug"); !ok && len(debug) != 0 && (mode == global.DEV || mode == global.TEST) {
