@@ -4,8 +4,8 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/TravisRoad/gomarkit/global"
 	"github.com/redis/go-redis/v9"
+	"github.com/shijiahao314/go-qa/global"
 )
 
 func initRedis() *redis.Client {

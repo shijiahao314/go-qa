@@ -7,9 +7,9 @@ import (
 
 	"log/slog"
 
-	"github.com/TravisRoad/gomarkit/global"
-	"github.com/TravisRoad/gomarkit/helper"
 	"github.com/gin-gonic/gin"
+	"github.com/shijiahao314/go-qa/global"
+	"github.com/shijiahao314/go-qa/helper"
 	"github.com/spf13/viper"
 )
 

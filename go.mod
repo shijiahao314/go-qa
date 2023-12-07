@@ -1,4 +1,4 @@
-module github.com/TravisRoad/gomarkit
+module github.com/shijiahao314/go-qa
 
 go 1.21.1
 
@@ -10,6 +10,7 @@ require (
 	github.com/spf13/viper v1.16.0
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.16.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/driver/sqlite v1.5.3
 	gorm.io/gorm v1.25.5
@@ -60,6 +61,5 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

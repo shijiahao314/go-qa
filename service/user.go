@@ -3,9 +3,9 @@ package service
 import (
 	"fmt"
 
-	"github.com/TravisRoad/gomarkit/global"
-	"github.com/TravisRoad/gomarkit/model"
-	snowflake "github.com/TravisRoad/gomarkit/utils"
+	"github.com/shijiahao314/go-qa/global"
+	"github.com/shijiahao314/go-qa/model"
+	snowflake "github.com/shijiahao314/go-qa/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 

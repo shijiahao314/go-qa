@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/TravisRoad/gomarkit/errcode"
 	"github.com/gin-gonic/gin"
+	"github.com/shijiahao314/go-qa/errcode"
 )
 
 // Role is a middleware function that checks if the user has the required roles.

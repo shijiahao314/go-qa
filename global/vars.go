@@ -1,8 +1,8 @@
 package global
 
 import (
-	"github.com/TravisRoad/gomarkit/config"
 	"github.com/redis/go-redis/v9"
+	"github.com/shijiahao314/go-qa/config"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

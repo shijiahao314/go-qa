@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/TravisRoad/gomarkit/errcode"
-	"github.com/TravisRoad/gomarkit/model"
-	"github.com/TravisRoad/gomarkit/service"
 	"github.com/gin-gonic/gin"
+	"github.com/shijiahao314/go-qa/errcode"
+	"github.com/shijiahao314/go-qa/model"
+	"github.com/shijiahao314/go-qa/service"
 )
 
 type AdminApi struct{}

@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/TravisRoad/gomarkit/api"
 	"github.com/gin-gonic/gin"
+	"github.com/shijiahao314/go-qa/api"
 )
 
 type AuthRouter struct{}

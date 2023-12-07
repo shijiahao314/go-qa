@@ -3,12 +3,12 @@ package api
 import (
 	"net/http"
 
-	"github.com/TravisRoad/gomarkit/errcode"
-	"github.com/TravisRoad/gomarkit/global"
-	"github.com/TravisRoad/gomarkit/model"
-	"github.com/TravisRoad/gomarkit/service"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/shijiahao314/go-qa/errcode"
+	"github.com/shijiahao314/go-qa/global"
+	"github.com/shijiahao314/go-qa/model"
+	"github.com/shijiahao314/go-qa/service"
 	"go.uber.org/zap"
 )
 

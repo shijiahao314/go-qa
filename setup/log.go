@@ -3,7 +3,7 @@ package setup
 import (
 	"os"
 
-	"github.com/TravisRoad/gomarkit/global"
+	"github.com/shijiahao314/go-qa/global"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"

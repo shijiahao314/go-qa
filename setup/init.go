@@ -1,8 +1,8 @@
 package setup
 
 import (
-	"github.com/TravisRoad/gomarkit/global"
-	"github.com/TravisRoad/gomarkit/helper"
+	"github.com/shijiahao314/go-qa/global"
+	"github.com/shijiahao314/go-qa/helper"
 	"go.uber.org/zap"
 )
 

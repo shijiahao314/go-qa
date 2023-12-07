@@ -1,10 +1,10 @@
 package router
 
 import (
-	"github.com/TravisRoad/gomarkit/api"
-	"github.com/TravisRoad/gomarkit/global"
-	"github.com/TravisRoad/gomarkit/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/shijiahao314/go-qa/api"
+	"github.com/shijiahao314/go-qa/global"
+	"github.com/shijiahao314/go-qa/middleware"
 )
 
 type AdminRouter struct{}

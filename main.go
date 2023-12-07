@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/TravisRoad/gomarkit/global"
-	"github.com/TravisRoad/gomarkit/setup"
+	"github.com/shijiahao314/go-qa/global"
+	"github.com/shijiahao314/go-qa/setup"
 )
 
 func main() {

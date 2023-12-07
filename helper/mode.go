@@ -1,7 +1,7 @@
 package helper
 
 import (
-	"github.com/TravisRoad/gomarkit/global"
+	"github.com/shijiahao314/go-qa/global"
 )
 
 func GetMode() string {

@@ -3,12 +3,12 @@ package setup
 import (
 	"log/slog"
 
-	"github.com/TravisRoad/gomarkit/global"
-	"github.com/TravisRoad/gomarkit/router"
 	"github.com/boj/redistore"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
+	"github.com/shijiahao314/go-qa/global"
+	"github.com/shijiahao314/go-qa/router"
 )
 
 const (
