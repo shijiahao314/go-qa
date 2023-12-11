@@ -16,7 +16,8 @@ type User struct {
 }
 
 type UserInfo struct {
-	UserID   uint64 `json:"userid"`
+	// **将uint64序列化json中格式标记为string，否则前端解析出现溢出导致精度问题
+	UserID   uint64 `json:"userid,string"`
 	Username string `json:"username"`
 	Role     string `json:"role"`
 }

@@ -39,7 +39,7 @@ func initZap() *zap.Logger {
 			MaxBackups: 3,
 			MaxAge:     28, // days
 		}),
-		zap.InfoLevel,
+		zap.DebugLevel,
 	)
 	// output2: console
 	consoleCore := zapcore.NewCore(
