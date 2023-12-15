@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/boj/redistore"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
@@ -46,6 +47,8 @@ func InitRouter() *gin.Engine {
 		gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{HEALTH_PATH}}),
 		gin.Recovery(),
 	)
+
+	r.Use(cors.Default())
 
 	r.GET(HEALTH_PATH, func(ctx *gin.Context) {})
 
