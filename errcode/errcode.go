@@ -25,3 +25,17 @@ const (
 	DeleteUserFailed
 	AddUserFailed
 )
+
+// chat
+const (
+	// ChatInfo
+	AddChatInfoFailed = 300 + iota
+	DeleteChatInfoFailed
+	UpdateChatInfoFailed
+	GetChatInfosFailed
+	// ChatCard
+	AddChatCardFailed
+	DeleteChatCardFailed
+	UpdateChatCardFailed
+	GetChatCardsFailed
+)

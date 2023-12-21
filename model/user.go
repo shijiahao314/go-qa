@@ -6,7 +6,7 @@ import (
 )
 
 type User struct {
-	UserID    uint64 `gorm:"primary_key;type:bigint unsigned;comment:用户ID" json:"userid,string"`
+	UserID    uint64 `gorm:"primaryKey;type:bigint unsigned;comment:用户ID" json:"userid,string"`
 	Username  string `gorm:"type:varchar(32);comment:用户名" json:"username"`
 	Password  string `gorm:"type:varchar(128);comment:密码" json:"password"`
 	Role      string `gorm:"type:varchar(32);comment:角色" json:"role"`
