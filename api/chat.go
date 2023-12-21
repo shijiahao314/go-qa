@@ -12,11 +12,35 @@ import (
 
 type ChatApi struct{}
 
+// Add ChatInfo
 type AddChatInfoRequest struct {
 }
 
 type AddChatInfoResponse struct {
-	br BaseResponse
+	BR BaseResponse
+}
+
+// 新增ChatInfo
+func (ca *ChatApi) AddChatInfo(c *gin.Context) {
+	cs := new(service.ChatService)
+
+	chatInfo := model.ChatInfo{}
+	if err := c.ShouldBindJSON(&chatInfo); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": errcode.ParamParseFailed,
+			"msg":  err.Error(),
+		})
+		return
+	}
+
+	if err := cs.AddChatInfo(chatInfo); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": errcode.AddChatInfoFailed,
+			"msg":  err.Error(),
+		})
+		return
+	}
+
 }
 
 type GetChatInfosRequest struct {
