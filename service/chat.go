@@ -1,11 +1,11 @@
 package service
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
+	"gorm.io/gorm"
 )
 
 type ChatService struct{}
@@ -20,7 +20,6 @@ func (cs *ChatService) CheckUser(userId uint64, id uint) error {
 		return fmt.Errorf("user id [%d] does not match chat info user id [%d]", userId, chatInfo.UserID)
 	}
 	return nil
-	context.Context
 }
 
 // Add ChatInfo
@@ -54,7 +53,16 @@ func (cs *ChatService) DeleteChatInfo(id uint) error {
 
 // Update ChatInfo
 func (cs *ChatService) UpdateChatInfo(chatInfo model.ChatInfo) error {
-	if err := global.DB.Model(&model.ChatInfo{}).Where(&model.ChatInfo{ID: chatInfo.ID}).Save(&chatInfo).Error; err != nil {
+	tx := global.DB.Begin()
+	oldChatInfo := model.ChatInfo{}
+	if err := tx.Model(&model.ChatInfo{}).Where("id = ?", chatInfo.ID).Take(&oldChatInfo).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	// set new data
+	oldChatInfo.Title = chatInfo.Title
+
+	if err := global.DB.Model(&model.ChatInfo{}).Where("id = ?", oldChatInfo.ID).Save(&oldChatInfo).Error; err != nil {
 		return err
 	}
 
@@ -98,18 +106,42 @@ func (cs *ChatService) AddChatCard(chatCard model.ChatCard) error {
 		return err
 	}
 
-	if err := global.DB.Create(&chatCard).Error; err != nil {
+	if err := tx.Create(&chatCard).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
+
+	if err := tx.Model(&model.ChatInfo{}).Where("id = ?", chatCard.ChatInfoID).Update("num", gorm.Expr("num + 1")).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
 
 	return nil
 }
 
 // Delete ChatCard by id
 func (cs *ChatService) DeleteChatCard(id uint) error {
-	if err := global.DB.Delete(&model.ChatCard{}, id).Error; err != nil {
+	tx := global.DB.Begin()
+
+	var chatInfoID uint
+	if err := tx.Model(&model.ChatCard{}).Where(&model.ChatCard{ID: id}).Pluck("chat_info_id", &chatInfoID).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
+
+	if err := tx.Model(&model.ChatCard{}).Delete(&model.ChatCard{ID: id}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Model(&model.ChatInfo{}).Where(&model.ChatInfo{ID: chatInfoID}).Update("num", gorm.Expr("num - 1")).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
 
 	return nil
 }
