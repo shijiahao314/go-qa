@@ -24,3 +24,11 @@ func (as *AuthService) Login(username, password string) (model.User, error) {
 	user.Password = ""
 	return user, nil
 }
+
+func (as *AuthService) UserIDInDatabase(userId uint64) (bool, error) {
+	var user model.User
+	if err := global.DB.Model(&model.User{}).Where("user_id = ?", userId).First(&user).Error; err != nil {
+		return false, err
+	}
+	return true, nil
+}

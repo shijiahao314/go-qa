@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/errcode"
+	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
 	"github.com/shijiahao314/go-qa/service"
 )
@@ -14,33 +15,135 @@ type ChatApi struct{}
 
 // Add ChatInfo
 type AddChatInfoRequest struct {
+	UserID uint64 `json:"userid,string"`
+	Title  string `json:"title"`
 }
 
 type AddChatInfoResponse struct {
-	BR BaseResponse
+	BaseResponse
 }
 
 // 新增ChatInfo
 func (ca *ChatApi) AddChatInfo(c *gin.Context) {
-	cs := new(service.ChatService)
-
+	// request
+	var req AddChatInfoRequest
+	// response
+	res := AddChatInfoResponse{}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		res.Code = http.StatusBadRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	// data
 	chatInfo := model.ChatInfo{}
-	if err := c.ShouldBindJSON(&chatInfo); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": errcode.ParamParseFailed,
-			"msg":  err.Error(),
-		})
+	chatInfo.Title = req.Title
+	chatInfo.UserID = req.UserID
+	// service
+	as := new(service.AuthService)
+	if ok, err := as.UserIDInDatabase(req.UserID); !ok {
+		res.Code = http.StatusBadRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, res)
 		return
 	}
-
+	cs := new(service.ChatService)
 	if err := cs.AddChatInfo(chatInfo); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": errcode.AddChatInfoFailed,
-			"msg":  err.Error(),
-		})
+		res.Code = http.StatusBadRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, res)
 		return
 	}
+	// success
+	res.BaseResponse = BaseResponse{
+		Code: http.StatusOK,
+		Msg:  "success",
+	}
+	c.JSON(http.StatusOK, res)
+}
 
+type DeleteChatInfoRequest struct {
+}
+
+type DeleteChatInfoResponse struct {
+	BaseResponse
+}
+
+func (ca *ChatApi) DeleteChatInfo(c *gin.Context) {
+	// response
+	res := DeleteChatInfoResponse{}
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		res.Code = http.StatusBadRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	// service
+	cs := new(service.ChatService)
+	if err := cs.DeleteChatInfo(uint(id)); err != nil {
+		res.Code = http.StatusBadRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, res)
+		return
+	}
+	res.Code = http.StatusBadRequest
+	res.Msg = "success"
+	c.JSON(http.StatusOK, res)
+}
+
+type UpdateChatInfoRequest struct {
+	Title string `json:"title"`
+}
+
+type UpdateChatInfoResponse struct {
+	BaseResponse
+}
+
+func (ca *ChatApi) UpdateChatInfo(c *gin.Context) {
+	// request
+	var req UpdateChatInfoRequest
+	// response
+	res := UpdateChatInfoResponse{}
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		res.Code = http.StatusBadRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		res.Code = http.StatusBadRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	// 读
+	tx := global.DB.Begin()
+	chatInfo := model.ChatInfo{}
+	if err := tx.Model(&model.ChatInfo{}).Where("id = ?", id).First(&chatInfo).Error; err != nil {
+		tx.Rollback()
+		res.Code = http.StatusBadRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, res)
+		return
+	}
+	// data
+	chatInfo.Title = req.Title
+	// service
+	cs := new(service.ChatService)
+	if err := cs.UpdateChatInfo(chatInfo); err != nil {
+		tx.Rollback()
+		res.Code = http.StatusBadRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, res)
+		return
+	}
+	tx.Commit()
+	// success
+	res.Code = http.StatusBadRequest
+	res.Msg = "success"
+	c.JSON(http.StatusOK, res)
 }
 
 type GetChatInfosRequest struct {
@@ -90,4 +193,43 @@ func (ca *ChatApi) GetChatInfos(c *gin.Context) {
 	res.Data.ChatInfos = chatInfos
 
 	c.JSON(http.StatusOK, res)
+}
+
+// Add ChatInfo
+type AddChatCardRequest struct {
+}
+
+type AddChatCardResponse struct {
+	BaseResponse BaseResponse
+}
+
+// 新增ChatCard
+func (ca *ChatApi) AddChatCard(c *gin.Context) {
+}
+
+type DeleteChatCardRequest struct {
+}
+
+type DeleteChatCardResponse struct {
+}
+
+func (ca *ChatApi) DeleteChatCard(c *gin.Context) {}
+
+type UpdateChatCardRequest struct {
+}
+
+type UpdateChatCardResponse struct {
+}
+
+func (ca *ChatApi) UpdateChatCard(c *gin.Context) {}
+
+type GetChatCardsRequest struct {
+	UserID uint64 `json:"userid"`
+}
+
+type GetChatCardsResponse struct {
+}
+
+// 获取该用户下所有的ChatCard
+func (ca *ChatApi) GetChatCards(c *gin.Context) {
 }

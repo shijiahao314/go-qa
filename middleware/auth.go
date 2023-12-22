@@ -64,3 +64,25 @@ func Auth() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+// func UserExist() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		userId, ok := c.Get("UserID").(uint64)
+// 		if !ok {
+// 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+// 				"code": errcode.NotLogin,
+// 				"msg":  "not login",
+// 			})
+// 			return
+// 		}
+
+// 		if !UserIDInDatabase() {
+// 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+// 				"code": errcode.NotLogin,
+// 				"msg":  "not login",
+// 			})
+// 			return
+// 		}
+// 		c.Next()
+// 	}
+// }
