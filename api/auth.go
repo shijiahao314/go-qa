@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -19,21 +20,22 @@ type LoginReq struct {
 	Password string `json:"password"`
 }
 
-// signup
 func (aa *AuthApi) SignUp(c *gin.Context) {
-	type SignUpReq struct {
+	type SignUpRequest struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
-		Role     string `json:"Role"`
+		Role     string `json:"role"`
 	}
-
-	req := SignUpReq{}
+	type SignUpResponse struct {
+		BaseResponse
+	}
+	req := SignUpRequest{}
+	res := SignUpResponse{}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"code": errcode.SignupFailed,
-			"msg":  err.Error(),
-		})
 		global.Logger.Info("invalid request", zap.Error(err))
+		res.Code = errcode.SignupFailed
+		res.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
@@ -44,107 +46,130 @@ func (aa *AuthApi) SignUp(c *gin.Context) {
 	}
 	us := new(service.UserService)
 	if err := us.AddUser(u); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": errcode.AddUserFailed,
-			"msg":  err.Error(),
-		})
 		global.Logger.Info("failed to add user", zap.Error(err))
+		res.Code = errcode.AddUserFailed
+		res.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, res)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"msg":  "success",
-	})
 	global.Logger.Info("success add user", zap.String("username", u.Username))
+	res.Code = 0
+	res.Msg = "success"
+	c.JSON(http.StatusOK, res)
 }
 
-// login
+const (
+	USER_USER_ID_KEY  = "userid"
+	USER_USERNAME_KEY = "username"
+	USER_ROLE_KEY     = "role"
+)
+
 func (aa *AuthApi) Login(c *gin.Context) {
-	session := sessions.Default(c)
-	if uinfo, ok := session.Get(global.USER_INFO_KEY).(model.UserInfo); ok {
-		global.Logger.Info("already login", zap.String("username", uinfo.Username))
-		c.AbortWithStatusJSON(http.StatusOK, gin.H{
-			"code": 0,
-			"msg":  "success",
-		})
-		return
+	type LoginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
 	}
-
-	req := LoginReq{}
+	type LoginResponse struct {
+		BaseResponse
+	}
+	req := LoginRequest{}
+	res := LoginResponse{}
+	// request
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"code": errcode.LoginFailed,
-			"msg":  err.Error(),
-		})
 		global.Logger.Info("invalid request", zap.Error(err))
+		res.Code = errcode.LoginFailed
+		res.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, res)
 		return
 	}
-
+	// service
 	as := new(service.AuthService)
 	user, err := as.Login(req.Username, req.Password)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"code": errcode.UsernameOrPwd,
-			"msg":  err.Error(),
-		})
 		global.Logger.Info("invalid login auth", zap.String("username", req.Username), zap.Error(err))
+		res.Code = errcode.LoginFailed
+		res.Msg = err.Error()
+		c.JSON(http.StatusUnauthorized, res)
 		return
 	}
-
+	// session
+	session := sessions.Default(c)
+	userid := session.Get(USER_USER_ID_KEY)
+	if userid != nil && userid == strconv.FormatUint(user.UserID, 10) {
+		global.Logger.Info("already login", zap.String("username", req.Username))
+		res.Code = 0
+		res.Msg = "already login"
+		c.JSON(http.StatusOK, res)
+		return
+	}
 	userInfo := model.UserInfo{
 		UserID:   user.UserID,
 		Username: user.Username,
 		Role:     user.Role,
 	}
-
-	session.Set(global.USER_INFO_KEY, userInfo)
+	session.Set(USER_USER_ID_KEY, strconv.FormatUint(userInfo.UserID, 10))
+	session.Set(USER_USERNAME_KEY, userInfo.Username)
+	session.Set(USER_ROLE_KEY, userInfo.Role)
 	if err := session.Save(); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"code": errcode.SessionSave,
-			"msg":  err.Error(),
-		})
 		global.Logger.Info("failed to save session", zap.Error(err))
+		res.Code = errcode.SessionSave
+		res.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, res)
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"msg":  "success",
-	})
+	// success
+	res.Code = 0
+	res.Msg = "success"
+	c.JSON(http.StatusOK, res)
 }
 
 func (aa *AuthApi) Logout(c *gin.Context) {
+	type LogoutRequest struct {
+	}
+	type LogoutResponse struct {
+		BaseResponse
+	}
+	// req := LogoutRequest{}
+	res := LogoutResponse{}
+	// session
 	session := sessions.Default(c)
-	session.Clear()
-	if err := session.Save(); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"code": errcode.SessionSave,
-			"msg":  err.Error(),
-		})
-		global.Logger.Info("failed to save session", zap.Error(err))
+	userid := session.Get(USER_USER_ID_KEY)
+	if userid == nil {
+		res.Code = 0
+		res.Msg = "not login"
+		c.JSON(http.StatusUnauthorized, res)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"msg":  "success",
-	})
+	session.Clear()
+	session.Save()
+	res.Code = 0
+	res.Msg = "success"
+	c.JSON(http.StatusOK, res)
 }
 
 func (aa *AuthApi) IsLogin(c *gin.Context) {
+	type IsLoginRequest struct {
+	}
+	type IsLoginResponse struct {
+		BaseResponse
+		Username string `json:"username"`
+	}
+	// req := IsLoginRequest{}
+	res := IsLoginResponse{}
+	// session
 	session := sessions.Default(c)
-	uinfo, ok := session.Get(global.USER_INFO_KEY).(model.UserInfo)
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"code": errcode.NotLogin,
-			"msg":  "not login",
-		})
+	userid := session.Get(USER_USER_ID_KEY)
+	if userid != nil {
+		username := session.Get(USER_USERNAME_KEY).(string)
+		res.Code = 0
+		res.Msg = "is login"
+		res.Username = username
+		c.JSON(http.StatusOK, res)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"msg":  "success",
-		"data": uinfo,
-	})
-
+	// success
+	res.Code = errcode.NotLogin
+	res.Msg = "not login"
+	c.JSON(http.StatusUnauthorized, res)
 }

@@ -14,6 +14,7 @@ const (
 	SignupFailed = 100 + iota
 	LoginFailed
 	UsernameOrPwd
+	SessionDecode
 	SessionSave
 	NotLogin
 )

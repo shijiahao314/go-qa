@@ -13,7 +13,7 @@ const (
 )
 
 type ChatInfo struct {
-	ID        uint      `gorm:"primaryKey;comment:对话组ID"`
+	ID        uint      `gorm:"primaryKey;comment:对话组ID" json:"id,string"`
 	UserID    uint64    `gorm:"type:bigint unsigned;comment:所属UserID" json:"userid,string"`
 	Title     string    `gorm:"type:varchar(32);comment:题目" json:"title"`
 	Num       uint      `gorm:"comment:对话数量" json:"num"`
