@@ -22,5 +22,6 @@ func (cr *ChatRouter) Register(rg *gin.RouterGroup) {
 	r.POST("/chatCard", ChatApi.AddChatCard)
 	r.DELETE("/chatCard/:id", ChatApi.DeleteChatCard)
 	r.PUT("/chatCard", ChatApi.UpdateChatCard)
-	r.GET("/chatCard", ChatApi.GetChatCards)
+	// r.GET("/chatCard/:id", ChatApi.GetChatCard)
+	r.GET("/chatCards/:id", ChatApi.GetChatCards)
 }

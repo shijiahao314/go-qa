@@ -6,8 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/errcode"
+	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
 	"github.com/shijiahao314/go-qa/service"
+	"github.com/shijiahao314/go-qa/utils"
+	"go.uber.org/zap"
 )
 
 type ChatApi struct{}
@@ -261,13 +264,40 @@ type UpdateChatCardResponse struct {
 
 func (ca *ChatApi) UpdateChatCard(c *gin.Context) {}
 
-type GetChatCardsRequest struct {
-	UserID uint64 `json:"userid"`
-}
-
-type GetChatCardsResponse struct {
-}
-
-// 获取该用户下所有的ChatCard
+// 获取某一ChatID所有的ChatCard
 func (ca *ChatApi) GetChatCards(c *gin.Context) {
+	type GetChatCardsRequest struct {
+	}
+	type GetChatCardsResponse struct {
+		BaseResponse
+		Data struct {
+			ChatCards []model.ChatCard `json:"chat_cards"`
+		} `json:"data"`
+	}
+	// req := GetChatCardsRequest{}
+	res := GetChatCardsResponse{}
+	// param
+	chatId, err := utils.StringToUint(c.Param("id"))
+	if err != nil {
+		global.Logger.Info("invalid request", zap.Error(err))
+		res.Code = errcode.InvalidRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	// service
+	cs := new(service.ChatService)
+	chatCards, err := cs.GetChatCards(chatId)
+	if err != nil {
+		global.Logger.Info("failed to get chatcards", zap.Error(err))
+		res.Code = errcode.GetChatCardsFailed
+		res.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, res)
+		return
+	}
+	// success
+	res.Code = 0
+	res.Msg = "success"
+	res.Data.ChatCards = chatCards
+	c.JSON(http.StatusOK, res)
 }

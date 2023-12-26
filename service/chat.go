@@ -161,8 +161,16 @@ func (cs *ChatService) GetChatCard(id uint) (model.ChatCard, error) {
 	if err := global.DB.Model(&model.ChatCard{}).Where(&model.ChatCard{ID: id}).First(&chatCard).Error; err != nil {
 		return chatCard, err
 	}
-
 	return chatCard, nil
+}
+
+// Get ChatCards by ChatID
+func (cs *ChatService) GetChatCards(id uint) ([]model.ChatCard, error) {
+	chatCards := []model.ChatCard{}
+	if err := global.DB.Model(&model.ChatCard{}).Where(&model.ChatCard{ChatInfoID: id}).Find(&chatCards).Error; err != nil {
+		return nil, err
+	}
+	return chatCards, nil
 }
 
 // Get ChatCard by ChatInfo.ID

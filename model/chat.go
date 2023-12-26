@@ -22,8 +22,8 @@ type ChatInfo struct {
 }
 
 type ChatCard struct {
-	ID         uint     `gorm:"primarykey;comment:对话卡片ID"`
-	ChatInfoID uint     `gorm:"comment:所属ChatInfoID" json:"chat_info_id"` // 外键
+	ID         uint     `gorm:"primarykey;comment:对话卡片ID" json:"id,string"`
+	ChatInfoID uint     `gorm:"comment:所属ChatInfoID" json:"chat_info_id,string"` // 外键
 	Content    string   `gorm:"type:text;comment:内容" json:"content"`
-	Role       ChatRole `gorm:"type:varchar(8);comment:角色" json:"role"`
+	Role       ChatRole `gorm:"type:varchar(9);comment:角色" json:"role"`
 }
