@@ -59,12 +59,6 @@ func (aa *AuthApi) SignUp(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-const (
-	USER_USER_ID_KEY  = "userid"
-	USER_USERNAME_KEY = "username"
-	USER_ROLE_KEY     = "role"
-)
-
 func (aa *AuthApi) Login(c *gin.Context) {
 	type LoginRequest struct {
 		Username string `json:"username"`
@@ -95,7 +89,7 @@ func (aa *AuthApi) Login(c *gin.Context) {
 	}
 	// session
 	session := sessions.Default(c)
-	userid := session.Get(USER_USER_ID_KEY)
+	userid := session.Get(global.USER_USER_ID_KEY)
 	if userid != nil && userid == strconv.FormatUint(user.UserID, 10) {
 		global.Logger.Info("already login", zap.String("username", req.Username))
 		res.Code = 0
@@ -108,9 +102,9 @@ func (aa *AuthApi) Login(c *gin.Context) {
 		Username: user.Username,
 		Role:     user.Role,
 	}
-	session.Set(USER_USER_ID_KEY, strconv.FormatUint(userInfo.UserID, 10))
-	session.Set(USER_USERNAME_KEY, userInfo.Username)
-	session.Set(USER_ROLE_KEY, userInfo.Role)
+	session.Set(global.USER_USER_ID_KEY, strconv.FormatUint(userInfo.UserID, 10))
+	session.Set(global.USER_USERNAME_KEY, userInfo.Username)
+	session.Set(global.USER_ROLE_KEY, userInfo.Role)
 	if err := session.Save(); err != nil {
 		global.Logger.Info("failed to save session", zap.Error(err))
 		res.Code = errcode.SessionSave
@@ -134,7 +128,7 @@ func (aa *AuthApi) Logout(c *gin.Context) {
 	res := LogoutResponse{}
 	// session
 	session := sessions.Default(c)
-	userid := session.Get(USER_USER_ID_KEY)
+	userid := session.Get(global.USER_USER_ID_KEY)
 	if userid == nil {
 		res.Code = 0
 		res.Msg = "not login"
@@ -159,9 +153,9 @@ func (aa *AuthApi) IsLogin(c *gin.Context) {
 	res := IsLoginResponse{}
 	// session
 	session := sessions.Default(c)
-	userid := session.Get(USER_USER_ID_KEY)
+	userid := session.Get(global.USER_USER_ID_KEY)
 	if userid != nil {
-		username := session.Get(USER_USERNAME_KEY).(string)
+		username := session.Get(global.USER_USERNAME_KEY).(string)
 		res.Code = 0
 		res.Msg = "is login"
 		res.Username = username

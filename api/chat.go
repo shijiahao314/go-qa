@@ -154,7 +154,7 @@ func (ca *ChatApi) GetChatInfos(c *gin.Context) {
 	userid_string, ok := c.GetQuery("userid")
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"code": errcode.ParamParseFailed,
+			"code": errcode.InvalidRequest,
 			"msg":  "failed to parse userid",
 		})
 		return
@@ -162,7 +162,7 @@ func (ca *ChatApi) GetChatInfos(c *gin.Context) {
 	userid, err := strconv.ParseUint(userid_string, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"code": errcode.ParamParseFailed,
+			"code": errcode.InvalidRequest,
 			"msg":  "failed to parse userid_string to userid",
 		})
 		return

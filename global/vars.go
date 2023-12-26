@@ -27,7 +27,10 @@ var (
 )
 
 const (
-	USER_INFO_KEY = "user_info"
+	USER_INFO_KEY     = "user_info"
+	USER_USER_ID_KEY  = "userid"
+	USER_USERNAME_KEY = "username"
+	USER_ROLE_KEY     = "role"
 )
 
 const (

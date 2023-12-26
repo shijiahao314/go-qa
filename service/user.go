@@ -5,17 +5,20 @@ import (
 
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
-	snowflake "github.com/shijiahao314/go-qa/utils"
+	"github.com/shijiahao314/go-qa/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct{}
 
-// GetUsers retrieves a list of users from the database based on the specified pagination parameters.
-//
-// page: The page number of the results to retrieve. start from 1
-// size: The number of results per page.
-// []model.User: An array of model.User objects representing the retrieved users.
+func (us *UserService) UserExists(username string) (bool, error) {
+	var cnt int64
+	if err := global.DB.Model(&model.User{}).Where("username = ?", username).Count(&cnt).Error; err != nil {
+		return false, err
+	}
+	return cnt > 0, nil
+}
+
 func (us *UserService) GetUsers(page, size int) ([]model.User, int64, error) {
 	users := make([]model.User, 0)
 	var cnt int64
@@ -47,7 +50,7 @@ func (us *UserService) AddUser(u model.User) error {
 	}
 
 	user := model.User{
-		UserID:   snowflake.GetSnowflakeID(),
+		UserID:   utils.GetSnowflakeID(),
 		Username: u.Username,
 		Password: string(hashedPass),
 	}
@@ -78,7 +81,7 @@ func (us *UserService) AddUser(u model.User) error {
 	return nil
 }
 
-func (us *UserService) DeleteUser(id uint) error {
+func (us *UserService) DeleteUser(id uint64) error {
 	if err := global.DB.Delete(&model.User{}, id).Error; err != nil {
 		return err
 	}

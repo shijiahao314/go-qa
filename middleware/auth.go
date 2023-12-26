@@ -9,7 +9,6 @@ import (
 	"github.com/shijiahao314/go-qa/errcode"
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/helper"
-	"go.uber.org/zap"
 )
 
 func debugUserinfo(s sessions.Session) (map[string]interface{}, error) {
@@ -23,45 +22,25 @@ func debugUserinfo(s sessions.Session) (map[string]interface{}, error) {
 	return uinfo, fmt.Errorf("debugUserinfo failed to save session: %w", err)
 }
 
-func saveUserInfo(uinfo map[string]interface{}, c *gin.Context) {
-	c.Set("username", uinfo["username"])
-	c.Set("ID", uinfo["id"])
-	c.Set("role", uinfo["role"])
-}
-
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		uinfo, ok := session.Get(global.USER_INFO_KEY).(map[string]interface{})
 		mode := helper.GetMode()
-
-		// if debug mode on
-		if debug := c.Query("debug"); !ok && len(debug) != 0 && (mode == global.DEV || mode == global.TEST) {
-			userinfo, err := debugUserinfo(session)
-			if err != nil {
-				global.Logger.Error("failed to debugUserinfo", zap.Error(err))
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-					"code": errcode.SessionSave,
-					"msg":  err.Error(),
-				})
-				return
-			}
-			saveUserInfo(userinfo, c)
+		// test mode
+		if mode == global.TEST {
 			c.Next()
 			return
 		}
-
-		// or just return unauthorized
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"code": errcode.NotLogin,
-				"msg":  "not login",
-			})
+		session := sessions.Default(c)
+		role := session.Get(global.USER_ROLE_KEY)
+		if role != nil {
+			c.Set("role", role)
+			c.Next()
 			return
 		}
-
-		saveUserInfo(uinfo, c)
-		c.Next()
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"code": errcode.NotLogin,
+			"msg":  "not login",
+		})
 	}
 }
 

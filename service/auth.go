@@ -32,3 +32,14 @@ func (as *AuthService) UserIDInDatabase(userId uint64) (bool, error) {
 	}
 	return true, nil
 }
+
+func (as *AuthService) UserHasPermission(userid uint64) (bool, error) {
+	var user model.User
+	if err := global.DB.Model(&model.User{}).Where("user_id = ?", userid).First(&user).Error; err != nil {
+		return false, err
+	}
+	if user.Role == global.ROLE_ADMIN {
+		return true, nil
+	}
+	return false, nil
+}

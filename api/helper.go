@@ -15,7 +15,7 @@ func getPageAndSize(c *gin.Context) (page int, size int) {
 	if ok {
 		size, _ = strconv.Atoi(s)
 	}
-	if page < 0 {
+	if page < 1 {
 		page = 1
 	}
 	if size < 10 {

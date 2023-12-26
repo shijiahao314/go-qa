@@ -5,8 +5,10 @@ const (
 	Failed  = 1
 
 	// common
-	ParamParseFailed = 10
-	RoleMismatch     = 11
+	InvalidRequest = 10 + iota
+	RoleMismatch   = 11
+	InternalServerError
+	AssertError
 )
 
 // auth
@@ -21,10 +23,14 @@ const (
 
 // user
 const (
-	GetUsersFailed = 200 + iota
-	UpdateUserFailed
-	DeleteUserFailed
+	// add
+	UserExists = 200 + iota
 	AddUserFailed
+	// delete
+	DeleteUserFailed
+	GetUsersFailed
+	UpdateUserFailed
+	PermissionDenied
 )
 
 // chat

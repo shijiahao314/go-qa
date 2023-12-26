@@ -15,8 +15,22 @@ import (
 func Role(roles []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		flag := false
-		r, _ := c.Get("role")
-		role := r.(string)
+		_role, ok := c.Get("role")
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"code": errcode.InternalServerError,
+				"msg":  "internal server error",
+			})
+			return
+		}
+		role, ok := _role.(string)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"code": errcode.AssertError,
+				"msg":  "assert error",
+			})
+			return
+		}
 		for _, r := range roles {
 			if r == role {
 				flag = true
