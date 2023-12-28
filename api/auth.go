@@ -136,6 +136,7 @@ func (aa *AuthApi) Logout(c *gin.Context) {
 		return
 	}
 	session.Clear()
+	session.Options(sessions.Options{MaxAge: -1})
 	session.Save()
 	res.Code = 0
 	res.Msg = "success"
