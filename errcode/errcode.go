@@ -14,10 +14,11 @@ const (
 // auth
 const (
 	SignupFailed = 100 + iota
+	UsernameTooShort
 	LoginFailed
 	UsernameOrPwd
 	SessionDecode
-	SessionSave
+	SessionSaveFailed
 	NotLogin
 )
 

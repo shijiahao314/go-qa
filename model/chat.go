@@ -27,3 +27,9 @@ type ChatCard struct {
 	Content    string   `gorm:"type:text;comment:内容" json:"content"`
 	Role       ChatRole `gorm:"type:varchar(9);comment:角色" json:"role"`
 }
+
+type ChatCardDTO struct {
+	ChatInfoID uint     `json:"chat_info_id,string"`
+	Content    string   `json:"content"`
+	Role       ChatRole `json:"role"`
+}

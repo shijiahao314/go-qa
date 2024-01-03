@@ -15,109 +15,103 @@ import (
 
 type ChatApi struct{}
 
-// Add ChatInfo
-type AddChatInfoRequest struct {
-	UserID uint64 `json:"userid,string"`
-	Title  string `json:"title"`
-}
-
-type AddChatInfoResponse struct {
-	BaseResponse
-}
-
-// 新增ChatInfo
+// ChatInfo
+// AddChatInfo
 func (ca *ChatApi) AddChatInfo(c *gin.Context) {
-	// request
-	var req AddChatInfoRequest
-	// response
-	res := AddChatInfoResponse{}
+	type AddChatInfoRequest struct {
+		Title string `json:"title"`
+	}
+	type AddChatInfoResponse struct {
+		BaseResponse
+	}
+	req := AddChatInfoRequest{}
+	resp := AddChatInfoResponse{}
+	// param
 	if err := c.ShouldBindJSON(&req); err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusBadRequest, res)
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	uid := c.GetString(global.USER_USER_ID_KEY)
+	userid, err := utils.StringToUint64(uid)
+	if err != nil {
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
 	// data
 	chatInfo := model.ChatInfo{}
+	chatInfo.UserID = userid
 	chatInfo.Title = req.Title
-	chatInfo.UserID = req.UserID
 	// service
-	as := new(service.AuthService)
-	if ok, err := as.UserIDInDatabase(req.UserID); !ok {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusInternalServerError, res)
-		return
-	}
 	cs := new(service.ChatService)
 	if err := cs.AddChatInfo(chatInfo); err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusInternalServerError, res)
+		resp.Code = errcode.AddChatInfoFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
 	// success
-	res.BaseResponse = BaseResponse{
-		Code: http.StatusOK,
-		Msg:  "success",
-	}
-	c.JSON(http.StatusOK, res)
+	resp.Code = 0
+	resp.Msg = "success"
+	c.JSON(http.StatusOK, resp)
 }
 
-type DeleteChatInfoRequest struct {
-}
-
-type DeleteChatInfoResponse struct {
-	BaseResponse
-}
-
+// DeleteChatInfo
 func (ca *ChatApi) DeleteChatInfo(c *gin.Context) {
-	// response
-	res := DeleteChatInfoResponse{}
+	type DeleteChatInfoRequest struct {
+	}
+	type DeleteChatInfoResponse struct {
+		BaseResponse
+	}
+	// req := DeleteChatInfoRequest{}
+	resp := DeleteChatInfoResponse{}
+	// param
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusBadRequest, res)
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
 	// service
 	cs := new(service.ChatService)
 	if err := cs.DeleteChatInfo(uint(id)); err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusInternalServerError, res)
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
-	res.Code = http.StatusBadRequest
-	res.Msg = "success"
-	c.JSON(http.StatusOK, res)
+	// success
+	resp.Code = 0
+	resp.Msg = "success"
+	c.JSON(http.StatusOK, resp)
 }
 
-type UpdateChatInfoRequest struct {
-	Title string `json:"title"`
-}
-
-type UpdateChatInfoResponse struct {
-	BaseResponse
-}
-
+// UpdateChatInfo
 func (ca *ChatApi) UpdateChatInfo(c *gin.Context) {
-	// request
-	var req UpdateChatInfoRequest
-	// response
-	res := UpdateChatInfoResponse{}
+	type UpdateChatInfoRequest struct {
+		Title string `json:"title"`
+	}
+	type UpdateChatInfoResponse struct {
+		BaseResponse
+	}
+	req := UpdateChatInfoRequest{}
+	resp := UpdateChatInfoResponse{}
+	// param
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusBadRequest, res)
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusBadRequest, res)
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
 	// data
@@ -127,144 +121,129 @@ func (ca *ChatApi) UpdateChatInfo(c *gin.Context) {
 	// service
 	cs := new(service.ChatService)
 	if err := cs.UpdateChatInfo(chatInfo); err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusInternalServerError, res)
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
 	// success
-	res.Code = http.StatusBadRequest
-	res.Msg = "success"
-	c.JSON(http.StatusOK, res)
+	resp.Code = 0
+	resp.Msg = "success"
+	c.JSON(http.StatusOK, resp)
 }
 
-type GetChatInfosRequest struct {
-	UserID uint64 `json:"userid"`
-}
-
-type GetChatInfosResponse struct {
-	Code int    `json:"code"`
-	Msg  string `json:"msg"`
-	Data struct {
-		ChatInfos []model.ChatInfo `json:"chat_infos"`
-	} `json:"data"`
-}
-
-// 获取该用户下所有的ChatInfo
+// GetChatInfos: 获取当前用户所有的ChatInfo
 func (ca *ChatApi) GetChatInfos(c *gin.Context) {
-	cs := new(service.ChatService)
-
-	userid_string, ok := c.GetQuery("userid")
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": errcode.InvalidRequest,
-			"msg":  "failed to parse userid",
-		})
-		return
+	type GetChatInfosRequest struct {
 	}
-	userid, err := strconv.ParseUint(userid_string, 10, 64)
+	type GetChatInfosResponse struct {
+		BaseResponse
+		Data struct {
+			ChatInfos []model.ChatInfo `json:"chat_infos"`
+		} `json:"data"`
+	}
+	// req := GetChatInfosRequest{}
+	resp := GetChatInfosResponse{}
+	// param
+	uid := c.GetString(global.USER_USER_ID_KEY)
+	userid, err := utils.StringToUint64(uid)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": errcode.InvalidRequest,
-			"msg":  "failed to parse userid_string to userid",
-		})
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
-
+	// service
+	cs := new(service.ChatService)
 	chatInfos, err := cs.GetChatInfos(userid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": errcode.GetChatInfosFailed,
-			"msg":  err.Error(),
-		})
+		resp.Code = errcode.GetChatInfosFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
-
-	res := GetChatInfosResponse{}
-	res.Code = http.StatusOK
-	res.Data.ChatInfos = chatInfos
-
-	c.JSON(http.StatusOK, res)
+	resp.Code = 0
+	resp.Msg = "success"
+	resp.Data.ChatInfos = chatInfos
+	c.JSON(http.StatusOK, resp)
 }
 
-// Add ChatInfo
-type AddChatCardRequest struct {
-	ChatCard model.ChatCard `json:"chat_card"`
-}
-
-type AddChatCardResponse struct {
-	BaseResponse
-}
-
-// Add ChatCard
+// ChatCard
+// AddChatCard
 func (ca *ChatApi) AddChatCard(c *gin.Context) {
-	// request
-	var req AddChatCardRequest
-	// response
-	res := AddChatCardResponse{}
-	// data
+	type AddChatCardRequest struct {
+		model.ChatCardDTO
+	}
+	type AddChatCardResponse struct {
+		BaseResponse
+	}
+	req := AddChatCardRequest{}
+	resp := AddChatCardResponse{}
+	// param
 	if err := c.ShouldBindJSON(&req); err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusBadRequest, res)
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
-	chatCard := req.ChatCard
+	chatCard := model.ChatCard{}
+	chatCard.ChatInfoID = req.ChatCardDTO.ChatInfoID
+	chatCard.Content = req.ChatCardDTO.Content
+	chatCard.Role = req.ChatCardDTO.Role
 	// service
 	cs := new(service.ChatService)
 	if err := cs.AddChatCard(chatCard); err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusInternalServerError, res)
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
 	// success
-	res.Code = http.StatusBadRequest
-	res.Msg = "success"
-	c.JSON(http.StatusOK, res)
+	resp.Code = 0
+	resp.Msg = "success"
+	c.JSON(http.StatusOK, resp)
 }
 
-type DeleteChatCardRequest struct {
-}
-
-type DeleteChatCardResponse struct {
-	BaseResponse
-}
-
+// DeleteChatCard
 func (ca *ChatApi) DeleteChatCard(c *gin.Context) {
-	// response
-	res := DeleteChatCardResponse{}
-	// data
+	type DeleteChatCardRequest struct {
+	}
+	type DeleteChatCardResponse struct {
+		BaseResponse
+	}
+	// req := DeleteChatCardRequest{}
+	resp := DeleteChatCardResponse{}
+	// param
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusBadRequest, res)
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
 	// service
 	cs := new(service.ChatService)
 	if err := cs.DeleteChatCard(uint(id)); err != nil {
-		res.Code = http.StatusBadRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusInternalServerError, res)
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
 	// success
-	res.Code = http.StatusBadRequest
-	res.Msg = "success"
-	c.JSON(http.StatusOK, res)
+	resp.Code = 0
+	resp.Msg = "success"
+	c.JSON(http.StatusOK, resp)
 }
 
-type UpdateChatCardRequest struct {
+// UpdateChatCard
+func (ca *ChatApi) UpdateChatCard(c *gin.Context) {
+	type UpdateChatCardRequest struct {
+	}
+	type UpdateChatCardResponse struct {
+	}
 }
 
-type UpdateChatCardResponse struct {
-}
-
-func (ca *ChatApi) UpdateChatCard(c *gin.Context) {}
-
-// 获取某一ChatID所有的ChatCard
+// GetChatChards
 func (ca *ChatApi) GetChatCards(c *gin.Context) {
 	type GetChatCardsRequest struct {
 	}
@@ -275,14 +254,14 @@ func (ca *ChatApi) GetChatCards(c *gin.Context) {
 		} `json:"data"`
 	}
 	// req := GetChatCardsRequest{}
-	res := GetChatCardsResponse{}
+	resp := GetChatCardsResponse{}
 	// param
 	chatId, err := utils.StringToUint(c.Param("id"))
 	if err != nil {
 		global.Logger.Info("invalid request", zap.Error(err))
-		res.Code = errcode.InvalidRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusBadRequest, res)
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
 	// service
@@ -290,14 +269,14 @@ func (ca *ChatApi) GetChatCards(c *gin.Context) {
 	chatCards, err := cs.GetChatCards(chatId)
 	if err != nil {
 		global.Logger.Info("failed to get chatcards", zap.Error(err))
-		res.Code = errcode.GetChatCardsFailed
-		res.Msg = err.Error()
-		c.JSON(http.StatusInternalServerError, res)
+		resp.Code = errcode.GetChatCardsFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
 	// success
-	res.Code = 0
-	res.Msg = "success"
-	res.Data.ChatCards = chatCards
-	c.JSON(http.StatusOK, res)
+	resp.Code = 0
+	resp.Msg = "success"
+	resp.Data.ChatCards = chatCards
+	c.JSON(http.StatusOK, resp)
 }

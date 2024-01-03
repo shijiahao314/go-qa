@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -15,50 +14,53 @@ import (
 
 type AuthApi struct{}
 
-type LoginReq struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
+// SignUp
 func (aa *AuthApi) SignUp(c *gin.Context) {
 	type SignUpRequest struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
-		Role     string `json:"role"`
 	}
 	type SignUpResponse struct {
 		BaseResponse
 	}
 	req := SignUpRequest{}
-	res := SignUpResponse{}
+	resp := SignUpResponse{}
+	// param
 	if err := c.ShouldBindJSON(&req); err != nil {
 		global.Logger.Info("invalid request", zap.Error(err))
-		res.Code = errcode.SignupFailed
-		res.Msg = err.Error()
-		c.JSON(http.StatusBadRequest, res)
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
-
+	if len(req.Username) < 6 || len(req.Password) < 6 {
+		resp.Code = errcode.UsernameTooShort
+		resp.Msg = "username or password should not less than 6 chatacters"
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	// service
 	u := model.User{
 		Username: req.Username,
 		Password: req.Password,
-		Role:     req.Role,
+		Role:     global.ROLE_USER,
 	}
 	us := new(service.UserService)
 	if err := us.AddUser(u); err != nil {
 		global.Logger.Info("failed to add user", zap.Error(err))
-		res.Code = errcode.AddUserFailed
-		res.Msg = err.Error()
-		c.JSON(http.StatusInternalServerError, res)
+		resp.Code = errcode.AddUserFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
-
+	// success
 	global.Logger.Info("success add user", zap.String("username", u.Username))
-	res.Code = 0
-	res.Msg = "success"
-	c.JSON(http.StatusOK, res)
+	resp.Code = 0
+	resp.Msg = "success"
+	c.JSON(http.StatusOK, resp)
 }
 
+// Login
 func (aa *AuthApi) Login(c *gin.Context) {
 	type LoginRequest struct {
 		Username string `json:"username"`
@@ -69,10 +71,10 @@ func (aa *AuthApi) Login(c *gin.Context) {
 	}
 	req := LoginRequest{}
 	res := LoginResponse{}
-	// request
+	// param
 	if err := c.ShouldBindJSON(&req); err != nil {
 		global.Logger.Info("invalid request", zap.Error(err))
-		res.Code = errcode.LoginFailed
+		res.Code = errcode.InvalidRequest
 		res.Msg = err.Error()
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -81,7 +83,7 @@ func (aa *AuthApi) Login(c *gin.Context) {
 	as := new(service.AuthService)
 	user, err := as.Login(req.Username, req.Password)
 	if err != nil {
-		global.Logger.Info("invalid login auth", zap.String("username", req.Username), zap.Error(err))
+		global.Logger.Info("login failed", zap.String("username", req.Username), zap.Error(err))
 		res.Code = errcode.LoginFailed
 		res.Msg = err.Error()
 		c.JSON(http.StatusUnauthorized, res)
@@ -89,8 +91,7 @@ func (aa *AuthApi) Login(c *gin.Context) {
 	}
 	// session
 	session := sessions.Default(c)
-	userid := session.Get(global.USER_USER_ID_KEY)
-	if userid != nil && userid == strconv.FormatUint(user.UserID, 10) {
+	if userInfo := session.Get(global.USER_INFO_KEY); userInfo != nil {
 		global.Logger.Info("already login", zap.String("username", req.Username))
 		res.Code = 0
 		res.Msg = "already login"
@@ -102,12 +103,10 @@ func (aa *AuthApi) Login(c *gin.Context) {
 		Username: user.Username,
 		Role:     user.Role,
 	}
-	session.Set(global.USER_USER_ID_KEY, strconv.FormatUint(userInfo.UserID, 10))
-	session.Set(global.USER_USERNAME_KEY, userInfo.Username)
-	session.Set(global.USER_ROLE_KEY, userInfo.Role)
+	session.Set(global.USER_INFO_KEY, userInfo)
 	if err := session.Save(); err != nil {
 		global.Logger.Info("failed to save session", zap.Error(err))
-		res.Code = errcode.SessionSave
+		res.Code = errcode.SessionSaveFailed
 		res.Msg = err.Error()
 		c.JSON(http.StatusInternalServerError, res)
 		return
@@ -118,6 +117,7 @@ func (aa *AuthApi) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// Logout
 func (aa *AuthApi) Logout(c *gin.Context) {
 	type LogoutRequest struct {
 	}
@@ -128,21 +128,22 @@ func (aa *AuthApi) Logout(c *gin.Context) {
 	res := LogoutResponse{}
 	// session
 	session := sessions.Default(c)
-	userid := session.Get(global.USER_USER_ID_KEY)
-	if userid == nil {
+	if userInfo := session.Get(global.USER_INFO_KEY); userInfo == nil {
 		res.Code = 0
 		res.Msg = "not login"
 		c.JSON(http.StatusUnauthorized, res)
 		return
 	}
+	// success
 	session.Clear()
-	session.Options(sessions.Options{MaxAge: -1})
+	session.Options(sessions.Options{MaxAge: -1}) // clear client cookie
 	session.Save()
 	res.Code = 0
 	res.Msg = "success"
 	c.JSON(http.StatusOK, res)
 }
 
+// IsLogin
 func (aa *AuthApi) IsLogin(c *gin.Context) {
 	type IsLoginRequest struct {
 	}
@@ -154,17 +155,17 @@ func (aa *AuthApi) IsLogin(c *gin.Context) {
 	res := IsLoginResponse{}
 	// session
 	session := sessions.Default(c)
-	userid := session.Get(global.USER_USER_ID_KEY)
-	if userid != nil {
-		username := session.Get(global.USER_USERNAME_KEY).(string)
-		res.Code = 0
-		res.Msg = "is login"
-		res.Username = username
-		c.JSON(http.StatusOK, res)
+	uInfo := session.Get(global.USER_INFO_KEY)
+	if uInfo == nil {
+		res.Code = errcode.NotLogin
+		res.Msg = "not login"
+		c.JSON(http.StatusUnauthorized, res)
 		return
 	}
+	userInfo := uInfo.(map[string]interface{})
 	// success
-	res.Code = errcode.NotLogin
-	res.Msg = "not login"
-	c.JSON(http.StatusUnauthorized, res)
+	res.Code = 0
+	res.Msg = "is login"
+	res.Username = userInfo[global.USER_USERNAME_KEY].(string)
+	c.JSON(http.StatusOK, res)
 }

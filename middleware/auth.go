@@ -31,9 +31,12 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 		session := sessions.Default(c)
-		role := session.Get(global.USER_ROLE_KEY)
-		if role != nil {
-			c.Set("role", role)
+		if uInfo := session.Get(global.USER_INFO_KEY); uInfo != nil {
+			userInfo := uInfo.(map[string]interface{})
+			// set user info
+			for k := range userInfo {
+				c.Set(k, userInfo[k])
+			}
 			c.Next()
 			return
 		}

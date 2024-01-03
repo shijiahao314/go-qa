@@ -3,6 +3,8 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/api"
+	"github.com/shijiahao314/go-qa/global"
+	"github.com/shijiahao314/go-qa/middleware"
 )
 
 type ChatRouter struct{}
@@ -11,7 +13,7 @@ func (cr *ChatRouter) Register(rg *gin.RouterGroup) {
 	r := rg.Group("/chat")
 	ChatApi := new(api.ChatApi)
 
-	// r.Use(middleware.Auth(), middleware.Role([]string{global.ROLE_ADMIN}))
+	r.Use(middleware.Auth(), middleware.Role([]string{global.ROLE_ADMIN, global.ROLE_USER}))
 
 	// ChatInfo
 	r.POST("/chatInfo", ChatApi.AddChatInfo)
