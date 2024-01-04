@@ -168,6 +168,41 @@ func (ca *ChatApi) GetChatInfos(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// GetChatInfo
+func (ca *ChatApi) GetChatInfo(c *gin.Context) {
+	type GetChatInfosRequest struct {
+	}
+	type GetChatInfosResponse struct {
+		BaseResponse
+		Data struct {
+			ChatInfo model.ChatInfo `json:"chat_info"`
+		} `json:"data"`
+	}
+	// req := GetChatInfosRequest{}
+	resp := GetChatInfosResponse{}
+	// param
+	chatInfoId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	// service
+	cs := new(service.ChatService)
+	chatInfo, err := cs.GetChatInfo(uint(chatInfoId))
+	if err != nil {
+		resp.Code = errcode.GetChatInfosFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+	resp.Code = 0
+	resp.Msg = "success"
+	resp.Data.ChatInfo = chatInfo
+	c.JSON(http.StatusOK, resp)
+}
+
 // ChatCard
 // AddChatCard
 func (ca *ChatApi) AddChatCard(c *gin.Context) {
@@ -238,12 +273,48 @@ func (ca *ChatApi) DeleteChatCard(c *gin.Context) {
 // UpdateChatCard
 func (ca *ChatApi) UpdateChatCard(c *gin.Context) {
 	type UpdateChatCardRequest struct {
+		model.ChatCardDTO
 	}
 	type UpdateChatCardResponse struct {
+		BaseResponse
 	}
+	req := UpdateChatCardRequest{}
+	resp := UpdateChatCardResponse{}
+	// param
+	chatId, err := utils.StringToUint(c.Param("id"))
+	if err != nil {
+		global.Logger.Info("invalid request", zap.Error(err))
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	chatCard := model.ChatCard{}
+	chatCard.ID = uint(chatId)
+	chatCard.ChatInfoID = req.ChatCardDTO.ChatInfoID
+	chatCard.Content = req.ChatCardDTO.Content
+	chatCard.Role = req.ChatCardDTO.Role
+	// service
+	cs := new(service.ChatService)
+	if err := cs.UpdateChatCard(chatCard); err != nil {
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+	// success
+	resp.Code = 0
+	resp.Msg = "success"
+	c.JSON(http.StatusOK, resp)
 }
 
-// GetChatChards
+// GetChatCards
 func (ca *ChatApi) GetChatCards(c *gin.Context) {
 	type GetChatCardsRequest struct {
 	}
@@ -256,7 +327,7 @@ func (ca *ChatApi) GetChatCards(c *gin.Context) {
 	// req := GetChatCardsRequest{}
 	resp := GetChatCardsResponse{}
 	// param
-	chatId, err := utils.StringToUint(c.Param("id"))
+	chatInfoId, err := utils.StringToUint(c.Param("id"))
 	if err != nil {
 		global.Logger.Info("invalid request", zap.Error(err))
 		resp.Code = errcode.InvalidRequest
@@ -266,7 +337,7 @@ func (ca *ChatApi) GetChatCards(c *gin.Context) {
 	}
 	// service
 	cs := new(service.ChatService)
-	chatCards, err := cs.GetChatCards(chatId)
+	chatCards, err := cs.GetChatCards(chatInfoId)
 	if err != nil {
 		global.Logger.Info("failed to get chatcards", zap.Error(err))
 		resp.Code = errcode.GetChatCardsFailed
@@ -278,5 +349,43 @@ func (ca *ChatApi) GetChatCards(c *gin.Context) {
 	resp.Code = 0
 	resp.Msg = "success"
 	resp.Data.ChatCards = chatCards
+	c.JSON(http.StatusOK, resp)
+}
+
+// GetChatChard
+func (ca *ChatApi) GetChatCard(c *gin.Context) {
+	type GetChatCardRequest struct {
+	}
+	type GetChatCardResponse struct {
+		BaseResponse
+		Data struct {
+			ChatCard model.ChatCard `json:"chat_card"`
+		} `json:"data"`
+	}
+	// req := GetChatCardRequest{}
+	resp := GetChatCardResponse{}
+	// param
+	chatId, err := utils.StringToUint(c.Param("id"))
+	if err != nil {
+		global.Logger.Info("invalid request", zap.Error(err))
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	// service
+	cs := new(service.ChatService)
+	chatCard, err := cs.GetChatCard(chatId)
+	if err != nil {
+		global.Logger.Info("failed to get chatcards", zap.Error(err))
+		resp.Code = errcode.GetChatCardFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+	// success
+	resp.Code = 0
+	resp.Msg = "success"
+	resp.Data.ChatCard = chatCard
 	c.JSON(http.StatusOK, resp)
 }

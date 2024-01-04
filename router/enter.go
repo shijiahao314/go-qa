@@ -1,8 +1,6 @@
 package router
 
 import (
-	"time"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -15,14 +13,16 @@ func Register(r *gin.Engine) {
 	rr := r.Group("/api")
 
 	// 允许跨域
-	rr.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://10.29.146.70", "http://10.129.194.200", "http://10.112.188.168:3000"},
-		AllowMethods:     []string{"GET", "POST"},
-		AllowHeaders:     []string{"Origin"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+	// rr.Use(cors.New(cors.Config{
+	// 	AllowAllOrigins: true,
+	// 	// AllowOrigins:     []string{"http://10.129.246.191:3000", "http://10.112.188.168:3000"},
+	// 	AllowMethods:     []string{"GET", "POST"},
+	// 	AllowHeaders:     []string{"Origin"},
+	// 	ExposeHeaders:    []string{"Content-Length"},
+	// 	AllowCredentials: true,
+	// 	MaxAge:           12 * time.Hour,
+	// }))
+	rr.Use(cors.Default())
 
 	rts := []Router{
 		&AuthRouter{},

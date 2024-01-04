@@ -46,4 +46,5 @@ const (
 	DeleteChatCardFailed
 	UpdateChatCardFailed
 	GetChatCardsFailed
+	GetChatCardFailed
 )

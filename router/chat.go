@@ -17,13 +17,14 @@ func (cr *ChatRouter) Register(rg *gin.RouterGroup) {
 
 	// ChatInfo
 	r.POST("/chatInfo", ChatApi.AddChatInfo)
-	r.DELETE("/chatInfo/:id", ChatApi.DeleteChatInfo)
-	r.PUT("/chatInfo/:id", ChatApi.UpdateChatInfo)
-	r.GET("/chatInfo", ChatApi.GetChatInfos)
+	r.DELETE("/chatInfo/:id", ChatApi.DeleteChatInfo) // chatInfoId
+	r.PUT("/chatInfo/:id", ChatApi.UpdateChatInfo)    // chatInfoId
+	r.GET("/chatInfos", ChatApi.GetChatInfos)
+	r.GET("/chatInfo/:id", ChatApi.GetChatInfo) // chatInfoId
 	// ChatCard
 	r.POST("/chatCard", ChatApi.AddChatCard)
-	r.DELETE("/chatCard/:id", ChatApi.DeleteChatCard)
-	r.PUT("/chatCard", ChatApi.UpdateChatCard)
-	// r.GET("/chatCard/:id", ChatApi.GetChatCard)
-	r.GET("/chatCards/:id", ChatApi.GetChatCards)
+	r.DELETE("/chatCard/:id", ChatApi.DeleteChatCard) // chatCardId
+	r.PUT("/chatCard/:id", ChatApi.UpdateChatCard)    // chatCardId
+	r.GET("/chatCards/:id", ChatApi.GetChatCards)     // chatInfoId
+	r.GET("/chatCard/:id", ChatApi.GetChatCard)       // chatCardId
 }
