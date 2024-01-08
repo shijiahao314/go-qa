@@ -27,4 +27,6 @@ func (cr *ChatRouter) Register(rg *gin.RouterGroup) {
 	r.PUT("/chatCard/:id", ChatApi.UpdateChatCard)    // chatCardId
 	r.GET("/chatCards/:id", ChatApi.GetChatCards)     // chatInfoId
 	r.GET("/chatCard/:id", ChatApi.GetChatCard)       // chatCardId
+
+	// WebSocket
 }

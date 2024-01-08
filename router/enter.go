@@ -28,6 +28,7 @@ func Register(r *gin.Engine) {
 		&AuthRouter{},
 		&AdminRouter{},
 		&ChatRouter{},
+		&ChatWSRouter{},
 	}
 
 	for _, rt := range rts {
