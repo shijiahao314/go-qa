@@ -211,6 +211,7 @@ func (ca *ChatApi) AddChatCard(c *gin.Context) {
 	}
 	type AddChatCardResponse struct {
 		BaseResponse
+		ChatCard model.ChatCard `json:"chat_card"`
 	}
 	req := AddChatCardRequest{}
 	resp := AddChatCardResponse{}
@@ -222,12 +223,12 @@ func (ca *ChatApi) AddChatCard(c *gin.Context) {
 		return
 	}
 	chatCard := model.ChatCard{}
-	chatCard.ChatInfoID = req.ChatCardDTO.ChatInfoID
-	chatCard.Content = req.ChatCardDTO.Content
-	chatCard.Role = req.ChatCardDTO.Role
+	chatCard.ChatInfoID = req.ChatInfoID
+	chatCard.Content = req.Content
+	chatCard.Role = "user"
 	// service
 	cs := new(service.ChatService)
-	if err := cs.AddChatCard(chatCard); err != nil {
+	if err := cs.AddChatCard(&chatCard); err != nil {
 		resp.Code = errcode.InternalServerError
 		resp.Msg = err.Error()
 		c.JSON(http.StatusInternalServerError, resp)
@@ -236,6 +237,7 @@ func (ca *ChatApi) AddChatCard(c *gin.Context) {
 	// success
 	resp.Code = 0
 	resp.Msg = "success"
+	resp.ChatCard = chatCard
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -299,7 +301,6 @@ func (ca *ChatApi) UpdateChatCard(c *gin.Context) {
 	chatCard.ID = uint(chatId)
 	chatCard.ChatInfoID = req.ChatCardDTO.ChatInfoID
 	chatCard.Content = req.ChatCardDTO.Content
-	chatCard.Role = req.ChatCardDTO.Role
 	// service
 	cs := new(service.ChatService)
 	if err := cs.UpdateChatCard(chatCard); err != nil {

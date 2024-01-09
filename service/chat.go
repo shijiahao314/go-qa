@@ -86,7 +86,7 @@ func (cs *ChatService) GetChatInfos(userId uint64) ([]model.ChatInfo, error) {
 	tx := global.DB.Begin()
 
 	// Find查找UserID所有ChatInfo
-	if err := tx.Model(&model.ChatInfo{}).Where(&model.ChatInfo{UserID: userId}).Find(&chatInfos).Error; err != nil {
+	if err := tx.Model(&model.ChatInfo{}).Where(&model.ChatInfo{UserID: userId}).Find(&chatInfos).Order("created_at desc").Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (cs *ChatService) GetChatInfos(userId uint64) ([]model.ChatInfo, error) {
 }
 
 // Add ChatCard
-func (cs *ChatService) AddChatCard(chatCard model.ChatCard) error {
+func (cs *ChatService) AddChatCard(chatCard *model.ChatCard) error {
 	tx := global.DB.Begin()
 
 	// 检查ChatInfo是否存在

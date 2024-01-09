@@ -85,27 +85,25 @@ func (ca *ChatWSApi) ChatWebSocket(c *gin.Context) {
 		fmt.Printf("receive: %+v\n", rcvMsg)
 		if rcvMsg.Type == GetMsgs {
 			// GetMsgs
-			go func() {
-				cs := new(service.ChatService)
-				chatInfoID, err := utils.StringToUint(rcvMsg.ChatInfoID)
+			cs := new(service.ChatService)
+			chatInfoID, err := utils.StringToUint(rcvMsg.ChatInfoID)
+			if err != nil {
+				global.Logger.Error("invalid request", zap.Error(err))
+				return
+			}
+			chatCards, err := cs.GetChatCards(chatInfoID)
+			if err != nil {
+				global.Logger.Error("failed to get chatcards", zap.Error(err))
+				return
+			}
+			for _, chatCard := range chatCards {
+				fmt.Printf("send: %+v\n", chatCard)
+				err = conn.WriteJSON(chatCard)
 				if err != nil {
-					global.Logger.Error("invalid request", zap.Error(err))
-					return
+					global.Logger.Error("failed to write message", zap.Error(err))
+					break
 				}
-				chatCards, err := cs.GetChatCards(chatInfoID)
-				if err != nil {
-					global.Logger.Error("failed to get chatcards", zap.Error(err))
-					return
-				}
-				for _, chatCard := range chatCards {
-					fmt.Printf("send: %+v\n", chatCard)
-					err = conn.WriteJSON(chatCard)
-					if err != nil {
-						global.Logger.Error("failed to write message", zap.Error(err))
-						break
-					}
-				}
-			}()
+			}
 		} else {
 			sendMsg := WSChatSendMessage{
 				Content: rcvMsg.Content,
