@@ -1,6 +1,7 @@
 package global
 
 import (
+	"github.com/casbin/casbin/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/shijiahao314/go-qa/config"
 	"go.uber.org/zap"
@@ -19,11 +20,12 @@ const DEFAULT_MODE = DEV
 
 // vars
 var (
-	Config *config.Config
-	DB     *gorm.DB
-	Logger *zap.Logger
-	Redis  *redis.Client
-	Mode   ModeType
+	Mode     ModeType         // TEST / DEV / PROD
+	Config   *config.Config   // config.xxx.yaml
+	DB       *gorm.DB         // DB: MySQL ...
+	Logger   *zap.Logger      // Logger
+	Redis    *redis.Client    // Redis
+	Enforcer *casbin.Enforcer // casbin
 )
 
 const (

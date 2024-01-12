@@ -20,6 +20,8 @@ const (
 	SessionDecode
 	SessionSaveFailed
 	NotLogin
+	NoRoleExist
+	Unauthorized
 )
 
 // user

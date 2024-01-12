@@ -11,17 +11,6 @@ import (
 	"github.com/shijiahao314/go-qa/helper"
 )
 
-func debugUserinfo(s sessions.Session) (map[string]interface{}, error) {
-	uinfo := make(map[string]interface{}, 0)
-	uinfo["id"] = 1
-	uinfo["username"] = "admin"
-	uinfo["role"] = "admin"
-
-	s.Set(global.USER_INFO_KEY, uinfo)
-	err := s.Save()
-	return uinfo, fmt.Errorf("debugUserinfo failed to save session: %w", err)
-}
-
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		mode := helper.GetMode()
@@ -33,6 +22,47 @@ func Auth() gin.HandlerFunc {
 		session := sessions.Default(c)
 		if uInfo := session.Get(global.USER_INFO_KEY); uInfo != nil {
 			userInfo := uInfo.(map[string]interface{})
+			username, ok := userInfo[global.USER_USERNAME_KEY].(string)
+			if !ok {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"code": errcode.InternalServerError,
+					"msg":  fmt.Sprintf("key '%s' not in session", global.USER_USERNAME_KEY),
+				})
+				return
+			}
+			roles, err := global.Enforcer.GetRolesForUser(username)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"code": errcode.InternalServerError,
+					"msg":  err.Error(),
+				})
+				return
+			}
+			if len(roles) == 0 {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+					"code": errcode.NoRoleExist,
+					"msg":  "no role exists",
+				})
+				return
+			}
+			sub := username
+			obj := c.Request.URL.Path
+			act := c.Request.Method
+			ok, err = global.Enforcer.Enforce(sub, obj, act)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"code": errcode.InternalServerError,
+					"msg":  err.Error(),
+				})
+				return
+			}
+			if !ok {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+					"code": errcode.Unauthorized,
+					"msg":  "unauthorized",
+				})
+				return
+			}
 			// set user info
 			for k := range userInfo {
 				c.Set(k, userInfo[k])
@@ -46,25 +76,3 @@ func Auth() gin.HandlerFunc {
 		})
 	}
 }
-
-// func UserExist() gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		userId, ok := c.Get("UserID").(uint64)
-// 		if !ok {
-// 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-// 				"code": errcode.NotLogin,
-// 				"msg":  "not login",
-// 			})
-// 			return
-// 		}
-
-// 		if !UserIDInDatabase() {
-// 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-// 				"code": errcode.NotLogin,
-// 				"msg":  "not login",
-// 			})
-// 			return
-// 		}
-// 		c.Next()
-// 	}
-// }

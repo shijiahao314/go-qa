@@ -31,6 +31,7 @@ type ChatCard struct {
 }
 
 type ChatCardDTO struct {
-	ChatInfoID uint   `json:"chat_info_id,string"`
-	Content    string `json:"content"`
+	ChatInfoID uint     `json:"chat_info_id,string"`
+	Content    string   `json:"content"`
+	Role       ChatRole `json:"role"`
 }

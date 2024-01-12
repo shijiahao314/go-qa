@@ -225,7 +225,7 @@ func (ca *ChatApi) AddChatCard(c *gin.Context) {
 	chatCard := model.ChatCard{}
 	chatCard.ChatInfoID = req.ChatInfoID
 	chatCard.Content = req.Content
-	chatCard.Role = "user"
+	chatCard.Role = req.Role
 	// service
 	cs := new(service.ChatService)
 	if err := cs.AddChatCard(&chatCard); err != nil {

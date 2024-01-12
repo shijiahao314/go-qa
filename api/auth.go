@@ -33,7 +33,7 @@ func (aa *AuthApi) SignUp(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
-	if len(req.Username) < 6 || len(req.Password) < 6 {
+	if len(req.Username) < 3 || len(req.Password) < 6 {
 		resp.Code = errcode.UsernameTooShort
 		resp.Msg = "username or password should not less than 6 chatacters"
 		c.JSON(http.StatusBadRequest, resp)
@@ -98,7 +98,7 @@ func (aa *AuthApi) Login(c *gin.Context) {
 		c.JSON(http.StatusOK, res)
 		return
 	}
-	userInfo := model.UserInfo{
+	userInfo := model.UserDTO{
 		UserID:   user.UserID,
 		Username: user.Username,
 		Role:     user.Role,

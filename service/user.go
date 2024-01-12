@@ -55,10 +55,10 @@ func (us *UserService) AddUser(u model.User) error {
 		Password: string(hashedPass),
 	}
 	switch u.Role {
-	case global.ROLE_ADMIN:
-		user.Role = global.ROLE_ADMIN
-	case global.ROLE_USER:
-		user.Role = global.ROLE_USER
+	case model.UserRoleAdmin:
+		user.Role = model.UserRoleAdmin
+	case model.UserRoleUser:
+		user.Role = model.UserRoleUser
 	default:
 		return fmt.Errorf("invalid role type: %s", u.Role)
 	}
@@ -76,7 +76,7 @@ func (us *UserService) AddUser(u model.User) error {
 		tx.Rollback()
 		return err
 	}
-
+	global.Enforcer.AddPolicy(user.Username, user.Role)
 	tx.Commit()
 	return nil
 }

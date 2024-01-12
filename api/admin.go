@@ -20,18 +20,18 @@ type GetUsersResponse struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
 	Data struct {
-		Page  int              `json:"page"`
-		Size  int              `json:"size"`
-		Total int64            `json:"total"`
-		Users []model.UserInfo `json:"users"`
+		Page  int             `json:"page"`
+		Size  int             `json:"size"`
+		Total int64           `json:"total"`
+		Users []model.UserDTO `json:"users"`
 	} `json:"data"`
 }
 
 func (aa *AdminApi) AddUser(c *gin.Context) {
 	type AddUserRequest struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-		Role     string `json:"role"`
+		Username string         `json:"username"`
+		Password string         `json:"password"`
+		Role     model.UserRole `json:"role"`
 	}
 	type AddUserResponse struct {
 		BaseResponse
@@ -116,8 +116,8 @@ func (aa *AdminApi) DeleteUser(c *gin.Context) {
 func (aa *AdminApi) UpdateUser(c *gin.Context) {
 	type UpdateUserRequest struct {
 		// Username string `json:"username"` // 不允许修改用户名
-		Password string `json:"password"`
-		Role     string `json:"role"`
+		Password string         `json:"password"`
+		Role     model.UserRole `json:"role"`
 	}
 	type UpdateUserResponse struct {
 		BaseResponse
@@ -183,10 +183,10 @@ func (aa *AdminApi) GetUsers(c *gin.Context) {
 	type GetUsersResponse struct {
 		BaseResponse
 		Data struct {
-			Page      int              `json:"page"`
-			Size      int              `json:"size"`
-			Total     int64            `json:"total"`
-			UserInfos []model.UserInfo `json:"userInfos"`
+			Page      int             `json:"page"`
+			Size      int             `json:"size"`
+			Total     int64           `json:"total"`
+			UserInfos []model.UserDTO `json:"userInfos"`
 		}
 	}
 	// req := GetUsersRequest{}
@@ -210,9 +210,9 @@ func (aa *AdminApi) GetUsers(c *gin.Context) {
 	res.Data.Page = page
 	res.Data.Size = size
 	res.Data.Total = total
-	var usersInfos []model.UserInfo
+	var usersInfos []model.UserDTO
 	for _, u := range users {
-		usersInfos = append(usersInfos, model.UserInfo{
+		usersInfos = append(usersInfos, model.UserDTO{
 			UserID:   u.UserID,
 			Username: u.Username,
 			Role:     u.Role,

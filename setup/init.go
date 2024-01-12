@@ -7,11 +7,18 @@ import (
 )
 
 func Setup() {
+	// 初始化配置文件（首先）
 	InitViper()
-	global.DB = initDB()
+	// 初始化Logger
 	global.Logger = initZap()
+	// 初始化DB
+	global.DB = initDB()
+	// 初始化Redis
 	global.Redis = initRedis()
+	// 初始化casbin
+	global.Enforcer = initEnforcer()
 
+	// setup success info
 	global.Logger.Info("success setup",
 		zap.String("global.Mode", helper.GetMode()))
 }

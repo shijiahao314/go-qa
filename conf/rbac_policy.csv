@@ -1,0 +1,3 @@
+p, admin, /api
+p, user, /api/admin
+p, user, /api/chat
