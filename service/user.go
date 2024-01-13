@@ -53,14 +53,7 @@ func (us *UserService) AddUser(u model.User) error {
 		UserID:   utils.GetSnowflakeID(),
 		Username: u.Username,
 		Password: string(hashedPass),
-	}
-	switch u.Role {
-	case model.UserRoleAdmin:
-		user.Role = model.UserRoleAdmin
-	case model.UserRoleUser:
-		user.Role = model.UserRoleUser
-	default:
-		return fmt.Errorf("invalid role type: %s", u.Role)
+		Role:     u.Role,
 	}
 
 	var cnt int64
@@ -76,7 +69,8 @@ func (us *UserService) AddUser(u model.User) error {
 		tx.Rollback()
 		return err
 	}
-	global.Enforcer.AddPolicy(user.Username, user.Role)
+	// casbin: add policy
+	global.Enforcer.AddGroupingPolicy(user.Username, string(user.Role))
 	tx.Commit()
 	return nil
 }

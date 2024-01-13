@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/shijiahao314/go-qa/middleware"
 )
 
 type Router interface {
@@ -10,7 +11,8 @@ type Router interface {
 }
 
 func Register(r *gin.Engine) {
-	rr := r.Group("/api")
+	apiRouter := r.Group("/api")
+	authRouter := r.Group("/api")
 
 	// 允许跨域
 	// rr.Use(cors.New(cors.Config{
@@ -22,16 +24,23 @@ func Register(r *gin.Engine) {
 	// 	AllowCredentials: true,
 	// 	MaxAge:           12 * time.Hour,
 	// }))
-	rr.Use(cors.Default())
+	apiRouter.Use(cors.Default(), middleware.Auth())
 
-	rts := []Router{
-		&AuthRouter{},
+	rts1 := []Router{
 		&AdminRouter{},
 		&ChatRouter{},
 		&ChatWSRouter{},
 	}
 
-	for _, rt := range rts {
-		rt.Register(rr)
+	for _, rt := range rts1 {
+		rt.Register(apiRouter)
+	}
+
+	rts2 := []Router{
+		&AuthRouter{},
+	}
+
+	for _, rt := range rts2 {
+		rt.Register(authRouter)
 	}
 }

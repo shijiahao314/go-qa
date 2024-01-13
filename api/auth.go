@@ -43,7 +43,7 @@ func (aa *AuthApi) SignUp(c *gin.Context) {
 	u := model.User{
 		Username: req.Username,
 		Password: req.Password,
-		Role:     global.ROLE_USER,
+		Role:     model.UserRoleUser,
 	}
 	us := new(service.UserService)
 	if err := us.AddUser(u); err != nil {

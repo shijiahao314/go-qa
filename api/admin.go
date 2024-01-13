@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
 	"github.com/shijiahao314/go-qa/errcode"
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
@@ -15,17 +14,6 @@ import (
 )
 
 type AdminApi struct{}
-
-type GetUsersResponse struct {
-	Code int    `json:"code"`
-	Msg  string `json:"msg"`
-	Data struct {
-		Page  int             `json:"page"`
-		Size  int             `json:"size"`
-		Total int64           `json:"total"`
-		Users []model.UserDTO `json:"users"`
-	} `json:"data"`
-}
 
 func (aa *AdminApi) AddUser(c *gin.Context) {
 	type AddUserRequest struct {
@@ -134,22 +122,22 @@ func (aa *AdminApi) UpdateUser(c *gin.Context) {
 		return
 	}
 	// 查询当前用户权限
-	as := new(service.AuthService)
-	ok, err := as.UserHasPermission(id)
-	if err != nil {
-		global.Logger.Info("update user failed", zap.Error(err))
-		res.Code = errcode.UpdateUserFailed
-		res.Msg = err.Error()
-		c.JSON(http.StatusInternalServerError, res)
-		return
-	}
-	if !ok {
-		global.Logger.Info("permission denied", zap.Error(err))
-		res.Code = errcode.PermissionDenied
-		res.Msg = "permission denied"
-		c.JSON(http.StatusForbidden, res) // 403
-		return
-	}
+	// as := new(service.AuthService)
+	// ok, err := as.UserHasPermission(id)
+	// if err != nil {
+	// 	global.Logger.Info("update user failed", zap.Error(err))
+	// 	res.Code = errcode.UpdateUserFailed
+	// 	res.Msg = err.Error()
+	// 	c.JSON(http.StatusInternalServerError, res)
+	// 	return
+	// }
+	// if !ok {
+	// 	global.Logger.Info("permission denied", zap.Error(err))
+	// 	res.Code = errcode.PermissionDenied
+	// 	res.Msg = "permission denied"
+	// 	c.JSON(http.StatusForbidden, res) // 403
+	// 	return
+	// }
 	// json
 	if err := c.ShouldBindJSON(&req); err != nil {
 		global.Logger.Info("invalid request", zap.Error(err))
@@ -187,7 +175,7 @@ func (aa *AdminApi) GetUsers(c *gin.Context) {
 			Size      int             `json:"size"`
 			Total     int64           `json:"total"`
 			UserInfos []model.UserDTO `json:"userInfos"`
-		}
+		} `json:"data"`
 	}
 	// req := GetUsersRequest{}
 	res := GetUsersResponse{}

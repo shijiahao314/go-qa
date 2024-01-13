@@ -47,8 +47,8 @@ func Auth() gin.HandlerFunc {
 			}
 			sub := username
 			obj := c.Request.URL.Path
-			act := c.Request.Method
-			ok, err = global.Enforcer.Enforce(sub, obj, act)
+			// act := c.Request.Method
+			ok, err = global.Enforcer.Enforce(sub, obj)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 					"code": errcode.InternalServerError,
