@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// ChatRole
 type ChatRole string
 
 const (

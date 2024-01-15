@@ -1,3 +1,2 @@
-p, admin, /api
-p, user, /api/admin
-p, user, /api/chat
+p, admin, /api/*
+p, user, /api/chat/*

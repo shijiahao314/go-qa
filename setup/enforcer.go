@@ -1,12 +1,9 @@
 package setup
 
 import (
-	"fmt"
-
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/go-admin-team/gorm-adapter/v3"
 	"github.com/shijiahao314/go-qa/global"
-	// _ "github.com/go-sql-driver/mysql"
 )
 
 func initEnforcer() *casbin.Enforcer {
@@ -34,18 +31,8 @@ func initEnforcer() *casbin.Enforcer {
 
 	// Load the policy from DB.
 	e.LoadPolicy()
-	fmt.Println("policy: ", e.GetPolicy())
 
 	// Check the permission.
-	ok, err := e.Enforce("alice", "/api/user")
-	if err != nil {
-		panic(err)
-	}
-	if !ok {
-		println("permission denied")
-	} else {
-		println("permission granted")
-	}
 
 	// Modify the policy.
 	// e.AddPolicy(...)
