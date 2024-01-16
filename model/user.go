@@ -30,7 +30,7 @@ type User struct {
 type UserDTO struct {
 	UserID      uint64   `json:"userid,string"`
 	Username    string   `json:"username"`
-	Role        UserRole `json:"role,string"`
+	Role        UserRole `json:"role"`
 	Avatar      string   `json:"avatar"`
 	Nickname    string   `json:"nickname"`
 	Email       string   `json:"email"`

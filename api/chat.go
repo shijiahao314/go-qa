@@ -23,6 +23,9 @@ func (ca *ChatApi) AddChatInfo(c *gin.Context) {
 	}
 	type AddChatInfoResponse struct {
 		BaseResponse
+		Data struct {
+			ChatInfo model.ChatInfo `json:"chat_info"`
+		} `json:"data"`
 	}
 	req := AddChatInfoRequest{}
 	resp := AddChatInfoResponse{}
@@ -47,7 +50,7 @@ func (ca *ChatApi) AddChatInfo(c *gin.Context) {
 	chatInfo.Title = req.Title
 	// service
 	cs := new(service.ChatService)
-	if err := cs.AddChatInfo(chatInfo); err != nil {
+	if err := cs.AddChatInfo(&chatInfo); err != nil {
 		resp.Code = errcode.AddChatInfoFailed
 		resp.Msg = err.Error()
 		c.JSON(http.StatusInternalServerError, resp)
@@ -56,6 +59,7 @@ func (ca *ChatApi) AddChatInfo(c *gin.Context) {
 	// success
 	resp.Code = 0
 	resp.Msg = "success"
+	resp.Data.ChatInfo = chatInfo
 	c.JSON(http.StatusOK, resp)
 }
 
