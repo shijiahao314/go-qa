@@ -10,8 +10,14 @@ const (
 )
 
 type UserSetting struct {
-	UserID         uint64    `gorm:"type:bigint unsigned primaryKey;comment:所属UserID" json:"userid,string"`
-	OpenAI_API_Key string    `json:"openai_api_key"`
-	ChatModel      ChatModel `json:"chat_model"`
-	TestMode       bool      `json:"test_mode"`
+	UserID       uint64    `gorm:"primaryKey;type:bigint unsigned;comment:所属UserID"`
+	OpenaiApiKey string    `gorm:"type:char(51);comment:OpenAI API Key"`
+	ChatModel    ChatModel `gorm:"type:varchar(32);comment:对话模型"`
+	TestMode     bool      `gorm:"comment:测试模式开启"`
+}
+
+type UserSettingDTO struct {
+	OpenaiApiKey string    `json:"openai_api_key"`
+	ChatModel    ChatModel `json:"chat_model"`
+	TestMode     bool      `json:"test_mode"`
 }

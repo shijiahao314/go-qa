@@ -82,17 +82,13 @@ func (cs *ChatService) GetChatInfo(id uint) (model.ChatInfo, error) {
 // Get all ChatInfo
 func (cs *ChatService) GetChatInfos(userId uint64) ([]model.ChatInfo, error) {
 	chatInfos := make([]model.ChatInfo, 0)
-
 	tx := global.DB.Begin()
-
 	// Find查找UserID所有ChatInfo
 	if err := tx.Model(&model.ChatInfo{}).Where(&model.ChatInfo{UserID: userId}).Order("updated_at desc").Find(&chatInfos).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-
 	tx.Commit()
-
 	return chatInfos, nil
 }
 

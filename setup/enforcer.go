@@ -15,7 +15,7 @@ func initEnforcer() *casbin.Enforcer {
 	// You can also use an already existing gorm instance with gormadapter.NewAdapterByDB(gormInstance)
 	// a, _ := gormadapter.NewAdapter(global.Config.Database.Type, "mysql_username:mysql_password@tcp(127.0.0.1:3306)/") // Your driver and data source.
 	a, _ := gormadapter.NewAdapterByDB(global.DB)
-	e, _ = casbin.NewEnforcer("conf/rbac_model.conf", a)
+	e, _ = casbin.NewEnforcer("configh/casbin/rbac_model.conf", a)
 
 	// Or you can use an existing DB "abc" like this:
 	// The adapter will use the table named "casbin_rule".

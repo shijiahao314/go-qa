@@ -28,6 +28,7 @@ func initDB() *gorm.DB {
 		&model.User{},
 		&model.ChatInfo{},
 		&model.ChatCard{},
+		&model.UserSetting{},
 	)
 	if err != nil {
 		slog.Error("failed during automigration", "err", err.Error())

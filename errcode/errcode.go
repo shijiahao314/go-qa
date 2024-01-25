@@ -55,4 +55,6 @@ const (
 const (
 	// UpdateSetting
 	UpdateSettingFailed = 400 + iota
+	// GetSetting
+	GetSettingFailed
 )

@@ -18,13 +18,14 @@ func (ca *SettingApi) Register(rg *gin.RouterGroup) {
 	r := rg.Group("/setting")
 	// Setting
 	r.POST("/setting", ca.UpdateSetting)
+	r.GET("/setting", ca.GetSetting)
 }
 
 // Setting
 // UpdateSetting
 func (ca *SettingApi) UpdateSetting(c *gin.Context) {
 	type UpdateSettingRequest struct {
-		model.UserSetting
+		model.UserSettingDTO
 	}
 	type UpdateSettingResponse struct {
 		BaseResponse
@@ -48,11 +49,50 @@ func (ca *SettingApi) UpdateSetting(c *gin.Context) {
 	}
 	// service
 	ss := new(service.SettingService)
-	if err := ss.UpdateSetting(userid, req.UserSetting); err != nil {
+	if err := ss.UpdateSetting(userid, req.UserSettingDTO); err != nil {
 		resp.Code = errcode.UpdateSettingFailed
 		resp.Msg = err.Error()
 		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
+	// success
+	resp.Code = 0
+	resp.Msg = "success"
+	c.JSON(http.StatusOK, resp)
+}
+
+// GetSetting
+func (ca *SettingApi) GetSetting(c *gin.Context) {
+	type GetSettingRequest struct{}
+	type GetSettingResponse struct {
+		BaseResponse
+		UserSettingDTO model.UserSettingDTO `json:"setting"`
+	}
+	// req := GetSettingRequest{}
+	resp := GetSettingResponse{}
+	// param
+	uid := c.GetString(global.USER_USER_ID_KEY)
+	userid, err := utils.StringToUint64(uid)
+	if err != nil {
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+	// service
+	ss := new(service.SettingService)
+	setting, err := ss.GetSetting(userid)
+	if err != nil {
+		resp.Code = errcode.GetSettingFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+	// success
+	resp.Code = 0
+	resp.Msg = "success"
+	resp.UserSettingDTO.OpenaiApiKey = setting.OpenaiApiKey
+	resp.UserSettingDTO.ChatModel = setting.ChatModel
+	resp.UserSettingDTO.TestMode = setting.TestMode
 	c.JSON(http.StatusOK, resp)
 }
