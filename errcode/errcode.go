@@ -54,7 +54,8 @@ const (
 // setting
 const (
 	// UpdateSetting
-	UpdateSettingFailed = 400 + iota
+	ChatModelNotExists = 400 + iota
+	UpdateSettingFailed
 	// GetSetting
 	GetSettingFailed
 )

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,15 @@ func (ca *SettingApi) Register(rg *gin.RouterGroup) {
 	r.GET("/setting", ca.GetSetting)
 }
 
+func (ca *SettingApi) checkChatModel(chatModel model.ChatModel) error {
+	switch chatModel {
+	case "gpt-3.5-turbo":
+		return nil
+	default:
+		return fmt.Errorf("unknown model '%s'", chatModel)
+	}
+}
+
 // Setting
 // UpdateSetting
 func (ca *SettingApi) UpdateSetting(c *gin.Context) {
@@ -35,6 +45,13 @@ func (ca *SettingApi) UpdateSetting(c *gin.Context) {
 	// param
 	if err := c.ShouldBindJSON(&req); err != nil {
 		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	// check model
+	if err := ca.checkChatModel(req.ChatModel); err != nil {
+		resp.Code = errcode.ChatModelNotExists
 		resp.Msg = err.Error()
 		c.JSON(http.StatusBadRequest, resp)
 		return
