@@ -7,10 +7,17 @@ import (
 	"github.com/shijiahao314/go-qa/errcode"
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
+	"github.com/shijiahao314/go-qa/service"
 	"github.com/shijiahao314/go-qa/utils"
 )
 
 type SettingApi struct {
+}
+
+func (ca *SettingApi) Register(rg *gin.RouterGroup) {
+	r := rg.Group("/setting")
+	// Setting
+	r.POST("/setting", ca.UpdateSetting)
 }
 
 // Setting
@@ -35,5 +42,17 @@ func (ca *SettingApi) UpdateSetting(c *gin.Context) {
 	userid, err := utils.StringToUint64(uid)
 	if err != nil {
 		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
 	}
+	// service
+	ss := new(service.SettingService)
+	if err := ss.UpdateSetting(userid, req.UserSetting); err != nil {
+		resp.Code = errcode.UpdateSettingFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
 }

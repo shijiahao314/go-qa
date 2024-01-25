@@ -15,6 +15,22 @@ import (
 
 type ChatApi struct{}
 
+func (ca *ChatApi) Register(rg *gin.RouterGroup) {
+	r := rg.Group("/chat")
+	// ChatInfo
+	r.POST("/chatInfo", ca.AddChatInfo)
+	r.DELETE("/chatInfo/:id", ca.DeleteChatInfo) // chatInfoId
+	r.PUT("/chatInfo/:id", ca.UpdateChatInfo)    // chatInfoId
+	r.GET("/chatInfos", ca.GetChatInfos)
+	r.GET("/chatInfo/:id", ca.GetChatInfo) // chatInfoId
+	// ChatCard
+	r.POST("/chatCard", ca.AddChatCard)
+	r.DELETE("/chatCard/:id", ca.DeleteChatCard) // chatCardId
+	r.PUT("/chatCard/:id", ca.UpdateChatCard)    // chatCardId
+	r.GET("/chatCards/:id", ca.GetChatCards)     // chatInfoId
+	r.GET("/chatCard/:id", ca.GetChatCard)       // chatCardId
+}
+
 // ChatInfo
 // AddChatInfo
 func (ca *ChatApi) AddChatInfo(c *gin.Context) {

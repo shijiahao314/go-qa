@@ -16,6 +16,12 @@ import (
 
 type ChatWSApi struct{}
 
+func (ca *ChatWSApi) Register(rg *gin.RouterGroup) {
+	r := rg.Group("/chat")
+	// ws
+	r.GET("/ws", ca.ChatWebSocket)
+}
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,

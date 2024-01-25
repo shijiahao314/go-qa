@@ -14,6 +14,18 @@ import (
 
 type AuthApi struct{}
 
+func (aa *AuthApi) Register(rg *gin.RouterGroup) {
+	r := rg.Group("/auth")
+	// SignUp
+	r.POST("/signup", aa.SignUp)
+	// Login
+	r.POST("/login", aa.Login)
+	// Logout
+	r.POST("/logout", aa.Logout)
+	// IsLogin
+	r.GET("/islogin", aa.IsLogin)
+}
+
 // SignUp
 func (aa *AuthApi) SignUp(c *gin.Context) {
 	type SignUpRequest struct {

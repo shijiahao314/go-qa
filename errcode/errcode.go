@@ -50,3 +50,9 @@ const (
 	GetChatCardsFailed
 	GetChatCardFailed
 )
+
+// setting
+const (
+	// UpdateSetting
+	UpdateSettingFailed = 400 + iota
+)

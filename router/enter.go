@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/shijiahao314/go-qa/api"
 	"github.com/shijiahao314/go-qa/middleware"
 )
 
@@ -27,9 +28,10 @@ func Register(r *gin.Engine) {
 	apiRouter.Use(cors.Default(), middleware.Auth())
 
 	rts1 := []Router{
-		&AdminRouter{},
-		&ChatRouter{},
-		&ChatWSRouter{},
+		&api.AdminApi{},
+		&api.ChatApi{},
+		&api.ChatWSApi{},
+		&api.SettingApi{},
 	}
 
 	for _, rt := range rts1 {
@@ -37,7 +39,7 @@ func Register(r *gin.Engine) {
 	}
 
 	rts2 := []Router{
-		&AuthRouter{},
+		&api.AuthApi{},
 	}
 
 	for _, rt := range rts2 {

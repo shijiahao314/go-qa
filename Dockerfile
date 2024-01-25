@@ -1,4 +1,4 @@
-from golang:1.21.1-alpine3.18 as base
+FROM golang:1.21.1-alpine3.18 as base
 
 ENV GOPROXY https://goproxy.cn,direct
 RUN apk add --no-cache --update gcc g++
@@ -16,4 +16,3 @@ COPY --from=base /go/build/exe /
 COPY --from=base /go/build/config.prod.yaml /app
 EXPOSE 8080
 CMD /exe
-

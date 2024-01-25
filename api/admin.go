@@ -15,6 +15,15 @@ import (
 
 type AdminApi struct{}
 
+func (aa *AdminApi) Register(rg *gin.RouterGroup) {
+	r := rg.Group("/admin")
+	// User
+	r.GET("/user", aa.GetUsers)
+	r.POST("/user", aa.AddUser)
+	r.POST("/user/:id", aa.UpdateUser)
+	r.DELETE("/user/:id", aa.DeleteUser)
+}
+
 func (aa *AdminApi) AddUser(c *gin.Context) {
 	type AddUserRequest struct {
 		Username string         `json:"username"`
