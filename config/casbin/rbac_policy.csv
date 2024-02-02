@@ -1,2 +1,3 @@
 p, admin, /api/*
 p, user, /api/chat/*
+p, user, /api/settings/*
