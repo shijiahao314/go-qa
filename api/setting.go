@@ -16,10 +16,10 @@ type SettingApi struct {
 }
 
 func (ca *SettingApi) Register(rg *gin.RouterGroup) {
-	r := rg.Group("/setting")
+	r := rg.Group("/settings")
 	// Setting
-	r.POST("/setting", ca.UpdateSetting)
-	r.GET("/setting", ca.GetSetting)
+	r.POST("/settings", ca.UpdateSetting)
+	r.GET("/settings", ca.GetSetting)
 }
 
 func (ca *SettingApi) checkChatModel(chatModel model.ChatModel) error {
