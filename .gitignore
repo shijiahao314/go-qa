@@ -4,3 +4,6 @@ out
 vendor
 
 logs
+
+config.*.yaml
+!config.example.yaml
