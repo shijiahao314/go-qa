@@ -181,3 +181,8 @@ func (aa *AuthApi) IsLogin(c *gin.Context) {
 	res.Username = userInfo[global.USER_USERNAME_KEY].(string)
 	c.JSON(http.StatusOK, res)
 }
+
+// Github Login
+func (aa *AuthApi) HandleGithubLogin(c *gin.Context) {
+	// GET https://github.com/login/oauth/authorize
+}

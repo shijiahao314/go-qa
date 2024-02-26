@@ -5,25 +5,30 @@ token: token
 
 # 前端盐
 salt: salt
-
 database:
   type: mysql
   sqlite:
     path: data.sqlite
   mysql:
     username: root
-    password: 123456
+    password: qa-mysql-password
     path: 127.0.0.1
     port: 3306
-    dbname: gomarkit
+    dbname: qa
     config: charset=utf8mb4&parseTime=True&loc=Local
     max-idle-conns: 10
     max-open-conns: 100
     log-mode: ""
     log-zap: false
+
 redis:
   enable: true
   db: 0
   addr: 127.0.0.1:6379
   password: ""
   connection-num: 10
+
+oauth:
+  github:
+    client-id: "xxx"
+    client_secret: "xxxxx"
