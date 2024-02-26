@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -10,6 +12,8 @@ import (
 	"github.com/shijiahao314/go-qa/model"
 	"github.com/shijiahao314/go-qa/service"
 	"go.uber.org/zap"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/github"
 )
 
 type AuthApi struct{}
@@ -24,6 +28,10 @@ func (aa *AuthApi) Register(rg *gin.RouterGroup) {
 	r.POST("/logout", aa.Logout)
 	// IsLogin
 	r.GET("/islogin", aa.IsLogin)
+	// login/github
+	r.GET("/oauth/github/login", aa.HandleGithubLogin)
+	// oauth/github
+	r.GET("/oauth/github/callback", aa.HandleGithubCallback)
 }
 
 // SignUp
@@ -184,5 +192,49 @@ func (aa *AuthApi) IsLogin(c *gin.Context) {
 
 // Github Login
 func (aa *AuthApi) HandleGithubLogin(c *gin.Context) {
+	c.Redirect(http.StatusTemporaryRedirect, global.Config.OAuthConfig.Github.RedirectURL)
+}
+
+func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
+	type GithubLoginRequest struct {
+	}
+	type GithubLoginResponse struct {
+		BaseResponse
+	}
+	resp := GithubLoginResponse{}
 	// GET https://github.com/login/oauth/authorize
+	conf := &oauth2.Config{
+		ClientID:     global.Config.OAuthConfig.Github.ClientID,
+		ClientSecret: global.Config.OAuthConfig.Github.ClientSecret,
+		Scopes:       []string{},
+		Endpoint:     github.Endpoint,
+	}
+	// 查询code
+	code := c.Query("code")
+	// 使用code换取token
+	token, err := conf.Exchange(c, code)
+	// url := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s", global.Config.OAuthConfig.Github.ClientID, global.Config.OAuthConfig.Github.ClientSecret, code)
+	// req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+	// 使用token获取用户信息
+	client := conf.Client(c, token)
+	user, err := client.Get("https://api.github.com/user")
+	if err != nil {
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+	respbody, _ := io.ReadAll(user.Body)
+	userInfo := string(respbody)
+	fmt.Println(userInfo)
+	resp.Code = 0
+	resp.Msg = "success"
+	c.JSON(http.StatusOK, resp)
+	// c.Redirect(http.StatusTemporaryRedirect, "/userInfo")
 }
