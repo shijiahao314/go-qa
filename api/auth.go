@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -205,11 +206,8 @@ func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
 	}
 	// 查询code
 	code := c.Query("code")
-	fmt.Println(code)
 	// 使用code换取token
 	token, err := conf.Exchange(c, code)
-	// url := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s", global.Config.OAuthConfig.Github.ClientID, global.Config.OAuthConfig.Github.ClientSecret, code)
-	// req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		resp.Code = errcode.InternalServerError
 		resp.Msg = err.Error()
@@ -225,11 +223,16 @@ func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
-	respbody, _ := io.ReadAll(user.Body)
-	userInfo := string(respbody)
-	fmt.Println(userInfo)
+	data, _ := io.ReadAll(user.Body)
+	userInfo := &model.GithubUserDTO{}
+	if err := json.Unmarshal(data, userInfo); err != nil {
+		resp.Code = errcode.InternalServerError
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+	fmt.Printf("Github UserInfo: \n%v\n", userInfo)
 	resp.Code = 0
 	resp.Msg = "success"
 	c.JSON(http.StatusOK, resp)
-	// c.Redirect(http.StatusTemporaryRedirect, "/userInfo")
 }

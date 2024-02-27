@@ -49,7 +49,7 @@ func (aa *AdminApi) AddUser(c *gin.Context) {
 	newUser.Role = req.Role
 	// service
 	us := new(service.UserService)
-	ok, err := us.UserExists(newUser.Username)
+	ok, err := us.UsernameExists(newUser.Username)
 	if err != nil {
 		global.Logger.Info("failed to check user exists", zap.Error(err))
 		res.Code = errcode.InternalServerError

@@ -27,6 +27,12 @@ type User struct {
 	DeletedAt   sql.NullTime `gorm:"index"`
 }
 
+type GithubUser struct {
+	ID        uint64 `gorm:"primaryKey;type:bigint unsigned;comment:Github用户ID"`
+	Login     string `gorm:"type:varchar(32);comment:Github用户名"`
+	AvatarURL string `gorm:"type:varchar(128);comment:Github头像"`
+}
+
 type UserDTO struct {
 	UserID      uint64   `json:"userid,string"`
 	Username    string   `json:"username"`
@@ -35,4 +41,10 @@ type UserDTO struct {
 	Nickname    string   `json:"nickname"`
 	Email       string   `json:"email"`
 	PhoneNumber string   `json:"phone_number"`
+}
+
+type GithubUserDTO struct {
+	Login     string `json:"login"`
+	ID        int    `json:"id"`
+	AvatarURL string `json:"avatar_url"`
 }

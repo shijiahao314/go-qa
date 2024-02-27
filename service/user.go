@@ -11,38 +11,6 @@ import (
 
 type UserService struct{}
 
-func (us *UserService) UserExists(username string) (bool, error) {
-	var cnt int64
-	if err := global.DB.Model(&model.User{}).Where("username = ?", username).Count(&cnt).Error; err != nil {
-		return false, err
-	}
-	return cnt > 0, nil
-}
-
-func (us *UserService) GetUsers(page, size int) ([]model.User, int64, error) {
-	users := make([]model.User, 0)
-	var cnt int64
-
-	tx := global.DB.Begin()
-
-	if err := tx.Model(&model.User{}).Offset((page - 1) * size).Limit(size).Find(&users).Error; err != nil {
-		tx.Rollback()
-		return nil, 0, err
-	}
-
-	if err := tx.Model(&model.User{}).Count(&cnt).Error; err != nil {
-		tx.Rollback()
-		return nil, 0, err
-	}
-
-	for _, u := range users {
-		u.Password = ""
-	}
-
-	tx.Commit()
-	return users, cnt, nil
-}
-
 func (us *UserService) AddUser(u model.User) error {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -109,4 +77,44 @@ func (us *UserService) UpdateUser(u model.User) error {
 
 	tx.Commit()
 	return nil
+}
+
+func (us *UserService) UsernameExists(username string) (bool, error) {
+	var cnt int64
+	if err := global.DB.Model(&model.User{}).Where("username = ?", username).Count(&cnt).Error; err != nil {
+		return false, err
+	}
+	return cnt > 0, nil
+}
+
+func (us *UserService) GithubUserExists(id uint64) (bool, error) {
+	var cnt int64
+	if err := global.DB.Model(&model.GithubUser{}).Where("id = ?", id).Count(&cnt).Error; err != nil {
+		return false, err
+	}
+	return cnt > 0, nil
+}
+
+func (us *UserService) GetUsers(page, size int) ([]model.User, int64, error) {
+	users := make([]model.User, 0)
+	var cnt int64
+
+	tx := global.DB.Begin()
+
+	if err := tx.Model(&model.User{}).Offset((page - 1) * size).Limit(size).Find(&users).Error; err != nil {
+		tx.Rollback()
+		return nil, 0, err
+	}
+
+	if err := tx.Model(&model.User{}).Count(&cnt).Error; err != nil {
+		tx.Rollback()
+		return nil, 0, err
+	}
+
+	for _, u := range users {
+		u.Password = ""
+	}
+
+	tx.Commit()
+	return users, cnt, nil
 }
