@@ -28,10 +28,8 @@ func (aa *AuthApi) Register(rg *gin.RouterGroup) {
 	r.POST("/logout", aa.Logout)
 	// IsLogin
 	r.GET("/islogin", aa.IsLogin)
-	// login/github
-	r.GET("/oauth/github/login", aa.HandleGithubLogin)
 	// oauth/github
-	r.GET("/oauth/github/callback", aa.HandleGithubCallback)
+	r.GET("/oauth/github", aa.HandleGithubCallback)
 }
 
 // SignUp
@@ -191,10 +189,6 @@ func (aa *AuthApi) IsLogin(c *gin.Context) {
 }
 
 // Github Login
-func (aa *AuthApi) HandleGithubLogin(c *gin.Context) {
-	c.Redirect(http.StatusTemporaryRedirect, global.Config.OAuthConfig.Github.RedirectURL)
-}
-
 func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
 	type GithubLoginRequest struct {
 	}
@@ -211,6 +205,7 @@ func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
 	}
 	// 查询code
 	code := c.Query("code")
+	fmt.Println(code)
 	// 使用code换取token
 	token, err := conf.Exchange(c, code)
 	// url := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s", global.Config.OAuthConfig.Github.ClientID, global.Config.OAuthConfig.Github.ClientSecret, code)
