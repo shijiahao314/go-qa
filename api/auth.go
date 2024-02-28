@@ -60,9 +60,10 @@ func (aa *AuthApi) SignUp(c *gin.Context) {
 	}
 	// service
 	u := model.User{
-		Username: req.Username,
-		Password: req.Password,
-		Role:     model.UserRoleUser,
+		AccountType: model.AccountTypeBase,
+		Username:    req.Username,
+		Password:    req.Password,
+		Role:        model.UserRoleUser,
 	}
 	us := new(service.UserService)
 	if err := us.AddUser(u); err != nil {

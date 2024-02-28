@@ -18,10 +18,11 @@ func (us *UserService) AddUser(u model.User) error {
 	}
 
 	user := model.User{
-		UserID:   utils.GetSnowflakeID(),
-		Username: u.Username,
-		Password: string(hashedPass),
-		Role:     u.Role,
+		UserID:      utils.GetSnowflakeID(),
+		AccountType: u.AccountType,
+		Username:    u.Username,
+		Password:    string(hashedPass),
+		Role:        u.Role,
 	}
 
 	var cnt int64

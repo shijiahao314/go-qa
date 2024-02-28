@@ -5,7 +5,15 @@ import (
 	"time"
 )
 
-// UserRole
+// AccountType 账号类型
+type AccountType string
+
+const (
+	AccountTypeBase   AccountType = "nextqa"
+	AccountTypeGithub AccountType = "github"
+)
+
+// UserRole 用户角色
 type UserRole string
 
 const (
@@ -14,14 +22,15 @@ const (
 )
 
 type User struct {
-	UserID      uint64   `gorm:"primaryKey;type:bigint unsigned;comment:用户ID"`
-	Username    string   `gorm:"type:varchar(32);comment:用户名"`
-	Password    string   `gorm:"type:varchar(128);comment:密码"`
-	Role        UserRole `gorm:"type:varchar(16);comment:角色"`
-	Avatar      string   `gorm:"type:varchar(128);comment:头像"`
-	Nickname    string   `gorm:"type:varchar(32);comment:昵称"`
-	Email       string   `gorm:"type:varchar(32);comment:邮箱"`
-	PhoneNumber string   `gorm:"type:varchar(11);comment:手机号"`
+	UserID      uint64      `gorm:"primaryKey;type:bigint unsigned;comment:用户ID"`
+	AccountType AccountType `gorm:"type:varchar(16);comment:账号类型"`
+	Username    string      `gorm:"type:varchar(32);comment:用户名"`
+	Password    string      `gorm:"type:varchar(128);comment:密码"`
+	Role        UserRole    `gorm:"type:varchar(16);comment:角色"`
+	Avatar      string      `gorm:"type:varchar(128);comment:头像"`
+	Nickname    string      `gorm:"type:varchar(32);comment:昵称"`
+	Email       string      `gorm:"type:varchar(32);comment:邮箱"`
+	PhoneNumber string      `gorm:"type:varchar(11);comment:手机号"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   sql.NullTime `gorm:"index"`

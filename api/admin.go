@@ -43,10 +43,12 @@ func (aa *AdminApi) AddUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
-	newUser := model.User{}
-	newUser.Username = req.Username
-	newUser.Password = req.Password
-	newUser.Role = req.Role
+	newUser := model.User{
+		AccountType: model.AccountTypeBase,
+		Username:    req.Username,
+		Password:    req.Password,
+		Role:        req.Role,
+	}
 	// service
 	us := new(service.UserService)
 	ok, err := us.UsernameExists(newUser.Username)
