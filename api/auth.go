@@ -224,6 +224,7 @@ func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
+	// defer user.Body.Close()
 	data, _ := io.ReadAll(user.Body)
 	userInfo := &model.GithubUserDTO{}
 	if err := json.Unmarshal(data, userInfo); err != nil {
