@@ -1,5 +1,7 @@
 # Go-QA：Next-QA对话系统后端服务
 
+<img class="badge" tag="github.com/shijiahao314/go-qa" src="/badge/github.com/shijiahao314/go-qa">
+
 > 前端Github仓库：[Next-QA](https://github.com/shijiahao314/next-qa)
 
 ## 技术栈
