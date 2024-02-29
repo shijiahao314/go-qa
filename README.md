@@ -1,6 +1,6 @@
 # Go-QA：Next-QA对话系统后端服务
 
-![go-qa](https://goreportcard.com/badge/github.com/shijiahao314/go-qa)
+[![go-qa](https://goreportcard.com/badge/github.com/shijiahao314/go-qa)](https://goreportcard.com/report/github.com/shijiahao314/go-qa)
 
 > 前端Github仓库：[Next-QA](https://github.com/shijiahao314/next-qa)
 
