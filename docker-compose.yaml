@@ -1,9 +1,9 @@
-version: '3'
+version: "3"
 services:
   qa-backend:
     image: golang:1.21.1
     volumes:
-      - '.:/go/src/qa-backend'
+      - ".:/go/src/qa-backend"
     ports:
       - 8080:8080
     working_dir: /go/src/qa-backend
