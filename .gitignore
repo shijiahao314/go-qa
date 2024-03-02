@@ -1,9 +1,87 @@
-log
-out
-*.sqlite
-vendor
+# Compiled Object files
+*.s[ol]
 
-logs
+# Precompiled Headers
+*.pch
 
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Debug files
+*.pdb
+*.dSYM/
+
+# Dependency directories
+vendor/
+
+# Go specific
+# Compiled Go binaries
+*.6
+*.8
+*.a
+
+# Specific to "go test"
+*.test
+*.bench
+
+# Go coverage files
+*.prof
+
+# Go build cache
+*.cache
+
+# Go dependency directories
+*/Godeps/
+*/_workspace/
+
+# Go bin directory (only if you're not using Go modules)
+*/bin/
+
+# Go module cache (only if you're using Go modules)
+go.sum
+!go.sum
+
+# Temporary files
+*.tmp
+*.temp
+
+# Minify, compress, map files
+*.map
+*.min.js
+*.min.css
+*.gz
+
+# Log files
+*.log
+
+# OS or Editor specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# End of gitignore
+
+.vscode/launch.json
 config.*.yaml
 !config.example.yaml

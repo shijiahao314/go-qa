@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/errcode"
+	"github.com/shijiahao314/go-qa/errmsg"
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
 	"github.com/shijiahao314/go-qa/service"
@@ -74,8 +75,8 @@ func (aa *AdminApi) AddUser(c *gin.Context) {
 		return
 	}
 	// success
-	res.Code = 0
-	res.Msg = "success"
+	res.Code = errcode.Success
+	res.Msg = errmsg.Success
 	c.JSON(http.StatusOK, res)
 }
 
@@ -107,8 +108,8 @@ func (aa *AdminApi) DeleteUser(c *gin.Context) {
 	}
 	// success
 	global.Logger.Info("success delete user", zap.Uint64("id", id))
-	res.Code = 0
-	res.Msg = "success"
+	res.Code = errcode.Success
+	res.Msg = errmsg.Success
 	c.JSON(http.StatusOK, res)
 }
 
@@ -154,8 +155,8 @@ func (aa *AdminApi) UpdateUser(c *gin.Context) {
 	}
 	// success
 	global.Logger.Info("success update user", zap.Uint64("userid", id))
-	res.Code = 0
-	res.Msg = "success"
+	res.Code = errcode.Success
+	res.Msg = errmsg.Success
 	c.JSON(http.StatusOK, res)
 }
 
@@ -187,17 +188,17 @@ func (aa *AdminApi) GetUsers(c *gin.Context) {
 	}
 	// success
 	global.Logger.Info("success get users")
-	res.Code = 0
-	res.Msg = "success"
+	res.Code = errcode.Success
+	res.Msg = errmsg.Success
 	res.Data.Page = page
 	res.Data.Size = size
 	res.Data.Total = total
 	var usersInfos []model.UserDTO
-	for _, u := range users {
+	for i := range users {
 		usersInfos = append(usersInfos, model.UserDTO{
-			UserID:   u.UserID,
-			Username: u.Username,
-			Role:     u.Role,
+			UserID:   users[i].UserID,
+			Username: users[i].Username,
+			Role:     users[i].Role,
 		})
 	}
 	res.Data.UserInfos = usersInfos

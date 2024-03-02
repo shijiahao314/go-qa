@@ -2,7 +2,6 @@ package setup
 
 import (
 	"github.com/shijiahao314/go-qa/global"
-	"github.com/shijiahao314/go-qa/helper"
 	"go.uber.org/zap"
 )
 
@@ -20,5 +19,5 @@ func Setup() {
 
 	// setup success info
 	global.Logger.Info("success setup",
-		zap.String("global.Mode", helper.GetMode()))
+		zap.String("global.Mode", string(global.Mode)))
 }

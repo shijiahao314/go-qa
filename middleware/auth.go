@@ -8,12 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/errcode"
 	"github.com/shijiahao314/go-qa/global"
-	"github.com/shijiahao314/go-qa/helper"
 )
 
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		mode := helper.GetMode()
+		mode := global.Mode
 		// test mode
 		if mode == global.TEST {
 			c.Next()
@@ -21,7 +20,7 @@ func Auth() gin.HandlerFunc {
 		}
 		session := sessions.Default(c)
 		if uInfo := session.Get(global.USER_INFO_KEY); uInfo != nil {
-			userInfo := uInfo.(map[string]interface{})
+			userInfo := uInfo.(map[string]any)
 			username, ok := userInfo[global.USER_USERNAME_KEY].(string)
 			if !ok {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -47,7 +46,6 @@ func Auth() gin.HandlerFunc {
 			}
 			sub := username
 			obj := c.Request.URL.Path
-			// act := c.Request.Method
 			ok, err = global.Enforcer.Enforce(sub, obj)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{

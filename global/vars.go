@@ -8,8 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// ModeType
-type ModeType string
+// AppMode
+type AppMode string
 
 const (
 	TEST = "TEST"
@@ -20,7 +20,7 @@ const DEFAULT_MODE = DEV
 
 // vars
 var (
-	Mode     ModeType         // TEST / DEV / PROD
+	Mode     AppMode          // TEST / DEV / PROD
 	Config   *config.Config   // config.xxx.yaml
 	DB       *gorm.DB         // DB: MySQL ...
 	Logger   *zap.Logger      // Logger
