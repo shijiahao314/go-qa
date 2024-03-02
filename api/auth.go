@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/errcode"
+	"github.com/shijiahao314/go-qa/errmsg"
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
 	"github.com/shijiahao314/go-qa/service"
@@ -75,8 +76,8 @@ func (aa *AuthApi) SignUp(c *gin.Context) {
 	}
 	// success
 	global.Logger.Info("success add user", zap.String("username", u.Username))
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -90,13 +91,13 @@ func (aa *AuthApi) Login(c *gin.Context) {
 		BaseResponse
 	}
 	req := LoginRequest{}
-	res := LoginResponse{}
+	resp := LoginResponse{}
 	// param
 	if err := c.ShouldBindJSON(&req); err != nil {
 		global.Logger.Info("invalid request", zap.Error(err))
-		res.Code = errcode.InvalidRequest
-		res.Msg = err.Error()
-		c.JSON(http.StatusBadRequest, res)
+		resp.Code = errcode.InvalidRequest
+		resp.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
 	// service
@@ -104,18 +105,18 @@ func (aa *AuthApi) Login(c *gin.Context) {
 	user, err := as.Login(req.Username, req.Password)
 	if err != nil {
 		global.Logger.Info("login failed", zap.String("username", req.Username), zap.Error(err))
-		res.Code = errcode.LoginFailed
-		res.Msg = err.Error()
-		c.JSON(http.StatusUnauthorized, res)
+		resp.Code = errcode.LoginFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusUnauthorized, resp)
 		return
 	}
 	// session
 	session := sessions.Default(c)
 	if userInfo := session.Get(global.USER_INFO_KEY); userInfo != nil {
 		global.Logger.Info("already login", zap.String("username", req.Username))
-		res.Code = 0
-		res.Msg = "already login"
-		c.JSON(http.StatusOK, res)
+		resp.Code = errcode.Success
+		resp.Msg = "already login"
+		c.JSON(http.StatusOK, resp)
 		return
 	}
 	userInfo := model.UserDTO{
@@ -126,15 +127,15 @@ func (aa *AuthApi) Login(c *gin.Context) {
 	session.Set(global.USER_INFO_KEY, userInfo)
 	if err := session.Save(); err != nil {
 		global.Logger.Info("failed to save session", zap.Error(err))
-		res.Code = errcode.SessionSaveFailed
-		res.Msg = err.Error()
-		c.JSON(http.StatusInternalServerError, res)
+		resp.Code = errcode.SessionSaveFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
 	// success
-	res.Code = 0
-	res.Msg = "success"
-	c.JSON(http.StatusOK, res)
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
+	c.JSON(http.StatusOK, resp)
 }
 
 // Logout
@@ -145,22 +146,28 @@ func (aa *AuthApi) Logout(c *gin.Context) {
 		BaseResponse
 	}
 	// req := LogoutRequest{}
-	res := LogoutResponse{}
+	resp := LogoutResponse{}
 	// session
 	session := sessions.Default(c)
 	if userInfo := session.Get(global.USER_INFO_KEY); userInfo == nil {
-		res.Code = 0
-		res.Msg = "not login"
-		c.JSON(http.StatusUnauthorized, res)
+		resp.Code = errcode.NotLogin
+		resp.Msg = "not login"
+		c.JSON(http.StatusUnauthorized, resp)
 		return
 	}
 	// success
 	session.Clear()
 	session.Options(sessions.Options{MaxAge: -1}) // clear client cookie
-	session.Save()
-	res.Code = 0
-	res.Msg = "success"
-	c.JSON(http.StatusOK, res)
+	if err := session.Save(); err != nil {
+		global.Logger.Info("failed to save session", zap.Error(err))
+		resp.Code = errcode.SessionSaveFailed
+		resp.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
+	c.JSON(http.StatusOK, resp)
 }
 
 // IsLogin
@@ -182,7 +189,7 @@ func (aa *AuthApi) IsLogin(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, res)
 		return
 	}
-	userInfo := uInfo.(map[string]interface{})
+	userInfo := uInfo.(map[string]any)
 	// success
 	res.Code = 0
 	res.Msg = "is login"
@@ -224,6 +231,7 @@ func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
+	defer user.Body.Close()
 	// defer user.Body.Close()
 	data, _ := io.ReadAll(user.Body)
 	userInfo := &model.GithubUserDTO{}
@@ -234,7 +242,7 @@ func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
 		return
 	}
 	fmt.Printf("Github UserInfo: \n%v\n", userInfo)
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	c.JSON(http.StatusOK, resp)
 }

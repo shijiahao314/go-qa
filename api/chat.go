@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/errcode"
+	"github.com/shijiahao314/go-qa/errmsg"
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
 	"github.com/shijiahao314/go-qa/service"
@@ -73,8 +74,8 @@ func (ca *ChatApi) AddChatInfo(c *gin.Context) {
 		return
 	}
 	// success
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	resp.Data.ChatInfo = chatInfo
 	c.JSON(http.StatusOK, resp)
 }
@@ -105,8 +106,8 @@ func (ca *ChatApi) DeleteChatInfo(c *gin.Context) {
 		return
 	}
 	// success
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -147,8 +148,8 @@ func (ca *ChatApi) UpdateChatInfo(c *gin.Context) {
 		return
 	}
 	// success
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -182,8 +183,8 @@ func (ca *ChatApi) GetChatInfos(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	resp.Data.ChatInfos = chatInfos
 	c.JSON(http.StatusOK, resp)
 }
@@ -201,7 +202,7 @@ func (ca *ChatApi) GetChatInfo(c *gin.Context) {
 	// req := GetChatInfosRequest{}
 	resp := GetChatInfosResponse{}
 	// param
-	chatInfoId, err := strconv.Atoi(c.Param("id"))
+	chatInfoID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		resp.Code = errcode.InvalidRequest
 		resp.Msg = err.Error()
@@ -210,15 +211,15 @@ func (ca *ChatApi) GetChatInfo(c *gin.Context) {
 	}
 	// service
 	cs := new(service.ChatService)
-	chatInfo, err := cs.GetChatInfo(uint(chatInfoId))
+	chatInfo, err := cs.GetChatInfo(uint(chatInfoID))
 	if err != nil {
 		resp.Code = errcode.GetChatInfosFailed
 		resp.Msg = err.Error()
 		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	resp.Data.ChatInfo = chatInfo
 	c.JSON(http.StatusOK, resp)
 }
@@ -255,8 +256,8 @@ func (ca *ChatApi) AddChatCard(c *gin.Context) {
 		return
 	}
 	// success
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	resp.ChatCard = chatCard
 	c.JSON(http.StatusOK, resp)
 }
@@ -287,8 +288,8 @@ func (ca *ChatApi) DeleteChatCard(c *gin.Context) {
 		return
 	}
 	// success
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -303,7 +304,7 @@ func (ca *ChatApi) UpdateChatCard(c *gin.Context) {
 	req := UpdateChatCardRequest{}
 	resp := UpdateChatCardResponse{}
 	// param
-	chatId, err := utils.StringToUint(c.Param("id"))
+	chatID, err := utils.StringToUint(c.Param("id"))
 	if err != nil {
 		global.Logger.Info("invalid request", zap.Error(err))
 		resp.Code = errcode.InvalidRequest
@@ -318,7 +319,7 @@ func (ca *ChatApi) UpdateChatCard(c *gin.Context) {
 		return
 	}
 	chatCard := model.ChatCard{}
-	chatCard.ID = uint(chatId)
+	chatCard.ID = chatID
 	chatCard.ChatInfoID = req.ChatCardDTO.ChatInfoID
 	chatCard.Content = req.ChatCardDTO.Content
 	// service
@@ -330,8 +331,8 @@ func (ca *ChatApi) UpdateChatCard(c *gin.Context) {
 		return
 	}
 	// success
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -348,7 +349,7 @@ func (ca *ChatApi) GetChatCards(c *gin.Context) {
 	// req := GetChatCardsRequest{}
 	resp := GetChatCardsResponse{}
 	// param
-	chatInfoId, err := utils.StringToUint(c.Param("id"))
+	chatInfoID, err := utils.StringToUint(c.Param("id"))
 	if err != nil {
 		global.Logger.Info("invalid request", zap.Error(err))
 		resp.Code = errcode.InvalidRequest
@@ -358,7 +359,7 @@ func (ca *ChatApi) GetChatCards(c *gin.Context) {
 	}
 	// service
 	cs := new(service.ChatService)
-	chatCards, err := cs.GetChatCards(chatInfoId)
+	chatCards, err := cs.GetChatCards(chatInfoID)
 	if err != nil {
 		global.Logger.Info("failed to get chatcards", zap.Error(err))
 		resp.Code = errcode.GetChatCardsFailed
@@ -367,8 +368,8 @@ func (ca *ChatApi) GetChatCards(c *gin.Context) {
 		return
 	}
 	// success
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	resp.Data.ChatCards = chatCards
 	c.JSON(http.StatusOK, resp)
 }
@@ -386,7 +387,7 @@ func (ca *ChatApi) GetChatCard(c *gin.Context) {
 	// req := GetChatCardRequest{}
 	resp := GetChatCardResponse{}
 	// param
-	chatId, err := utils.StringToUint(c.Param("id"))
+	chatID, err := utils.StringToUint(c.Param("id"))
 	if err != nil {
 		global.Logger.Info("invalid request", zap.Error(err))
 		resp.Code = errcode.InvalidRequest
@@ -396,7 +397,7 @@ func (ca *ChatApi) GetChatCard(c *gin.Context) {
 	}
 	// service
 	cs := new(service.ChatService)
-	chatCard, err := cs.GetChatCard(chatId)
+	chatCard, err := cs.GetChatCard(chatID)
 	if err != nil {
 		global.Logger.Info("failed to get chatcards", zap.Error(err))
 		resp.Code = errcode.GetChatCardFailed
@@ -405,8 +406,8 @@ func (ca *ChatApi) GetChatCard(c *gin.Context) {
 		return
 	}
 	// success
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	resp.Data.ChatCard = chatCard
 	c.JSON(http.StatusOK, resp)
 }
