@@ -29,7 +29,7 @@ func Register(r *gin.Engine) {
 	// apiRouter
 	apiRouter.Use(cors.Default(), middleware.Auth())
 	rts1 := []IRouter{
-		&api.AdminApi{},
+		&api.AdminAPI{},
 		&api.ChatAPI{},
 		&api.ChatWSApi{},
 		&api.SettingAPI{},
@@ -40,7 +40,7 @@ func Register(r *gin.Engine) {
 
 	// authRouter
 	rts2 := []IRouter{
-		&api.AuthApi{},
+		&api.AuthAPI{},
 	}
 	for _, rt := range rts2 {
 		rt.Register(authRouter)

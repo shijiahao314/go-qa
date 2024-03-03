@@ -82,12 +82,9 @@ func (ca *ChatAPI) AddChatInfo(c *gin.Context) {
 
 // DeleteChatInfo
 func (ca *ChatAPI) DeleteChatInfo(c *gin.Context) {
-	type DeleteChatInfoRequest struct {
-	}
 	type DeleteChatInfoResponse struct {
 		BaseResponse
 	}
-	// req := DeleteChatInfoRequest{}
 	resp := DeleteChatInfoResponse{}
 	// param
 	id, err := strconv.Atoi(c.Param("id"))
@@ -155,15 +152,12 @@ func (ca *ChatAPI) UpdateChatInfo(c *gin.Context) {
 
 // GetChatInfos: 获取当前用户所有的ChatInfo
 func (ca *ChatAPI) GetChatInfos(c *gin.Context) {
-	type GetChatInfosRequest struct {
-	}
 	type GetChatInfosResponse struct {
 		BaseResponse
 		Data struct {
 			ChatInfos []model.ChatInfo `json:"chat_infos"`
 		} `json:"data"`
 	}
-	// req := GetChatInfosRequest{}
 	resp := GetChatInfosResponse{}
 	// param
 	uid := c.GetString(global.USER_USER_ID_KEY)
@@ -191,15 +185,12 @@ func (ca *ChatAPI) GetChatInfos(c *gin.Context) {
 
 // GetChatInfo
 func (ca *ChatAPI) GetChatInfo(c *gin.Context) {
-	type GetChatInfosRequest struct {
-	}
 	type GetChatInfosResponse struct {
 		BaseResponse
 		Data struct {
 			ChatInfo model.ChatInfo `json:"chat_info"`
 		} `json:"data"`
 	}
-	// req := GetChatInfosRequest{}
 	resp := GetChatInfosResponse{}
 	// param
 	chatInfoID, err := strconv.Atoi(c.Param("id"))
@@ -264,12 +255,9 @@ func (ca *ChatAPI) AddChatCard(c *gin.Context) {
 
 // DeleteChatCard
 func (ca *ChatAPI) DeleteChatCard(c *gin.Context) {
-	type DeleteChatCardRequest struct {
-	}
 	type DeleteChatCardResponse struct {
 		BaseResponse
 	}
-	// req := DeleteChatCardRequest{}
 	resp := DeleteChatCardResponse{}
 	// param
 	id, err := strconv.Atoi(c.Param("id"))
@@ -338,15 +326,12 @@ func (ca *ChatAPI) UpdateChatCard(c *gin.Context) {
 
 // GetChatCards
 func (ca *ChatAPI) GetChatCards(c *gin.Context) {
-	type GetChatCardsRequest struct {
-	}
 	type GetChatCardsResponse struct {
 		BaseResponse
 		Data struct {
 			ChatCards []model.ChatCard `json:"chat_cards"`
 		} `json:"data"`
 	}
-	// req := GetChatCardsRequest{}
 	resp := GetChatCardsResponse{}
 	// param
 	chatInfoID, err := utils.StringToUint(c.Param("id"))
@@ -376,15 +361,12 @@ func (ca *ChatAPI) GetChatCards(c *gin.Context) {
 
 // GetChatChard
 func (ca *ChatAPI) GetChatCard(c *gin.Context) {
-	type GetChatCardRequest struct {
-	}
 	type GetChatCardResponse struct {
 		BaseResponse
 		Data struct {
 			ChatCard model.ChatCard `json:"chat_card"`
 		} `json:"data"`
 	}
-	// req := GetChatCardRequest{}
 	resp := GetChatCardResponse{}
 	// param
 	chatID, err := utils.StringToUint(c.Param("id"))

@@ -14,9 +14,9 @@ import (
 	"go.uber.org/zap"
 )
 
-type AdminApi struct{}
+type AdminAPI struct{}
 
-func (aa *AdminApi) Register(rg *gin.RouterGroup) {
+func (aa *AdminAPI) Register(rg *gin.RouterGroup) {
 	r := rg.Group("/admin")
 	// User
 	r.GET("/user", aa.GetUsers)
@@ -25,7 +25,7 @@ func (aa *AdminApi) Register(rg *gin.RouterGroup) {
 	r.DELETE("/user/:id", aa.DeleteUser)
 }
 
-func (aa *AdminApi) AddUser(c *gin.Context) {
+func (aa *AdminAPI) AddUser(c *gin.Context) {
 	type AddUserRequest struct {
 		Username string         `json:"username"`
 		Password string         `json:"password"`
@@ -80,13 +80,10 @@ func (aa *AdminApi) AddUser(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (aa *AdminApi) DeleteUser(c *gin.Context) {
-	type DeleteUserRequest struct {
-	}
+func (aa *AdminAPI) DeleteUser(c *gin.Context) {
 	type DeleteUserResponse struct {
 		BaseResponse
 	}
-	// req := DeleteUserRequest{}
 	res := DeleteUserResponse{}
 	// param
 	id, err := utils.StringToUint64(c.Param("id"))
@@ -113,7 +110,7 @@ func (aa *AdminApi) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (aa *AdminApi) UpdateUser(c *gin.Context) {
+func (aa *AdminAPI) UpdateUser(c *gin.Context) {
 	type UpdateUserRequest struct {
 		// Username string `json:"username"` // 不允许修改用户名
 		Password string         `json:"password"`
@@ -160,9 +157,7 @@ func (aa *AdminApi) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (aa *AdminApi) GetUsers(c *gin.Context) {
-	type GetUsersRequest struct {
-	}
+func (aa *AdminAPI) GetUsers(c *gin.Context) {
 	type GetUsersResponse struct {
 		BaseResponse
 		Data struct {
@@ -172,7 +167,6 @@ func (aa *AdminApi) GetUsers(c *gin.Context) {
 			UserInfos []model.UserDTO `json:"user_infos"`
 		} `json:"data"`
 	}
-	// req := GetUsersRequest{}
 	res := GetUsersResponse{}
 	// param
 	page, size := getPageAndSize(c)

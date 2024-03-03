@@ -18,9 +18,9 @@ import (
 	"golang.org/x/oauth2/github"
 )
 
-type AuthApi struct{}
+type AuthAPI struct{}
 
-func (aa *AuthApi) Register(rg *gin.RouterGroup) {
+func (aa *AuthAPI) Register(rg *gin.RouterGroup) {
 	r := rg.Group("/auth")
 	// SignUp
 	r.POST("/signup", aa.SignUp)
@@ -35,7 +35,7 @@ func (aa *AuthApi) Register(rg *gin.RouterGroup) {
 }
 
 // SignUp
-func (aa *AuthApi) SignUp(c *gin.Context) {
+func (aa *AuthAPI) SignUp(c *gin.Context) {
 	type SignUpRequest struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -82,7 +82,7 @@ func (aa *AuthApi) SignUp(c *gin.Context) {
 }
 
 // Login
-func (aa *AuthApi) Login(c *gin.Context) {
+func (aa *AuthAPI) Login(c *gin.Context) {
 	type LoginRequest struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -139,13 +139,10 @@ func (aa *AuthApi) Login(c *gin.Context) {
 }
 
 // Logout
-func (aa *AuthApi) Logout(c *gin.Context) {
-	type LogoutRequest struct {
-	}
+func (aa *AuthAPI) Logout(c *gin.Context) {
 	type LogoutResponse struct {
 		BaseResponse
 	}
-	// req := LogoutRequest{}
 	resp := LogoutResponse{}
 	// session
 	session := sessions.Default(c)
@@ -171,14 +168,11 @@ func (aa *AuthApi) Logout(c *gin.Context) {
 }
 
 // IsLogin
-func (aa *AuthApi) IsLogin(c *gin.Context) {
-	type IsLoginRequest struct {
-	}
+func (aa *AuthAPI) IsLogin(c *gin.Context) {
 	type IsLoginResponse struct {
 		BaseResponse
 		Username string `json:"username"`
 	}
-	// req := IsLoginRequest{}
 	res := IsLoginResponse{}
 	// session
 	session := sessions.Default(c)
@@ -198,9 +192,7 @@ func (aa *AuthApi) IsLogin(c *gin.Context) {
 }
 
 // Github Login
-func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
-	type GithubLoginRequest struct {
-	}
+func (aa *AuthAPI) HandleGithubCallback(c *gin.Context) {
 	type GithubLoginResponse struct {
 		BaseResponse
 	}
@@ -223,6 +215,7 @@ func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
 		return
 	}
 	// 使用token获取用户信息
+	// user, err := http.NewRequestWithContext(c, http.MethodGet, "https://api.github.com/user", nil)
 	client := conf.Client(c, token)
 	user, err := client.Get("https://api.github.com/user")
 	if err != nil {
@@ -232,7 +225,6 @@ func (aa *AuthApi) HandleGithubCallback(c *gin.Context) {
 		return
 	}
 	defer user.Body.Close()
-	// defer user.Body.Close()
 	data, _ := io.ReadAll(user.Body)
 	userInfo := &model.GithubUserDTO{}
 	if err := json.Unmarshal(data, userInfo); err != nil {

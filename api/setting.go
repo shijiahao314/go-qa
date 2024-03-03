@@ -81,12 +81,10 @@ func (ca *SettingAPI) UpdateSetting(c *gin.Context) {
 
 // GetSetting
 func (ca *SettingAPI) GetSetting(c *gin.Context) {
-	// type GetSettingRequest struct{}
 	type GetSettingResponse struct {
 		BaseResponse
 		UserSettingDTO model.UserSettingDTO `json:"setting"`
 	}
-	// req := GetSettingRequest{}
 	resp := GetSettingResponse{}
 	// param
 	uid := c.GetString(global.USER_USER_ID_KEY)
