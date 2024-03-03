@@ -30,9 +30,9 @@ func Register(r *gin.Engine) {
 	apiRouter.Use(cors.Default(), middleware.Auth())
 	rts1 := []IRouter{
 		&api.AdminApi{},
-		&api.ChatApi{},
+		&api.ChatAPI{},
 		&api.ChatWSApi{},
-		&api.SettingApi{},
+		&api.SettingAPI{},
 	}
 	for _, rt := range rts1 {
 		rt.Register(apiRouter)

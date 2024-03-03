@@ -17,7 +17,7 @@
 ```bash
 # docker build -t <image_name>:<image_tag> <path_to_dockerfile>
 docker run -itd --name qa-mysql --restart always -e MYSQL_ROOT_PASSWORD=qa-mysql-password -e MYSQL_DATABASE=qa -p 3306:3306 mysql
-docker run -itd --name qa-redis --restart always -p 6379:6379 redis
+docker run -itd --name qa-redis --restart always -p 6379:6379 redis --requirepass "qa-redis-password"
 docker build -t go-qa:v1 .
 ```
 

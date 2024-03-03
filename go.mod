@@ -14,6 +14,7 @@ require (
 	github.com/spf13/viper v1.16.0
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.19.0
+	golang.org/x/oauth2 v0.17.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/driver/sqlite v1.5.3
@@ -79,7 +80,6 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.6.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
-	golang.org/x/oauth2 v0.17.0 // indirect
 	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

@@ -1,6 +1,6 @@
 package config
 
-type Redis struct {
+type RedisConfig struct {
 	Enable        bool   `mapstructure:"enable" json:"enable" yaml:"enable"`
 	DB            int    `mapstructure:"db" json:"db" yaml:"db"`
 	Addr          string `mapstructure:"addr" json:"addr" yaml:"addr"`

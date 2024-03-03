@@ -13,17 +13,17 @@ import (
 	"github.com/shijiahao314/go-qa/utils"
 )
 
-type SettingApi struct {
+type SettingAPI struct {
 }
 
-func (ca *SettingApi) Register(rg *gin.RouterGroup) {
+func (ca *SettingAPI) Register(rg *gin.RouterGroup) {
 	r := rg.Group("/settings")
 	// Setting
 	r.POST("/settings", ca.UpdateSetting)
 	r.GET("/settings", ca.GetSetting)
 }
 
-func (ca *SettingApi) checkChatModel(chatModel model.ChatModel) error {
+func (ca *SettingAPI) checkChatModel(chatModel model.ChatModel) error {
 	switch chatModel {
 	case "gpt-3.5-turbo":
 		return nil
@@ -34,7 +34,7 @@ func (ca *SettingApi) checkChatModel(chatModel model.ChatModel) error {
 
 // Setting
 // UpdateSetting
-func (ca *SettingApi) UpdateSetting(c *gin.Context) {
+func (ca *SettingAPI) UpdateSetting(c *gin.Context) {
 	type UpdateSettingRequest struct {
 		model.UserSettingDTO
 	}
@@ -80,8 +80,8 @@ func (ca *SettingApi) UpdateSetting(c *gin.Context) {
 }
 
 // GetSetting
-func (ca *SettingApi) GetSetting(c *gin.Context) {
-	type GetSettingRequest struct{}
+func (ca *SettingAPI) GetSetting(c *gin.Context) {
+	// type GetSettingRequest struct{}
 	type GetSettingResponse struct {
 		BaseResponse
 		UserSettingDTO model.UserSettingDTO `json:"setting"`

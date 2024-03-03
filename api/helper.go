@@ -6,7 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getPageAndSize(c *gin.Context) (page int, size int) {
+const (
+	MinPage = 1
+	MinSize = 10
+	MaxSize = 100
+)
+
+func getPageAndSize(c *gin.Context) (page, size int) {
 	p, ok := c.GetQuery("page")
 	if ok {
 		page, _ = strconv.Atoi(p)
@@ -15,13 +21,13 @@ func getPageAndSize(c *gin.Context) (page int, size int) {
 	if ok {
 		size, _ = strconv.Atoi(s)
 	}
-	if page < 1 {
-		page = 1
+	if page < MinPage {
+		page = MinPage
 	}
-	if size < 10 {
-		size = 10
-	} else if size > 100 {
-		size = 100
+	if size < MinSize {
+		size = MinSize
+	} else if size > MaxSize {
+		size = MaxSize
 	}
 	return
 }

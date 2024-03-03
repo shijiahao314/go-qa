@@ -29,7 +29,7 @@ func InitMode() {
 			global.Mode = global.PROD
 		}
 	} else {
-		global.Mode = global.DEFAULT_MODE
+		global.Mode = global.DefaultAppMode
 	}
 }
 

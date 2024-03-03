@@ -16,7 +16,7 @@ const (
 	DEV  = "DEV"
 	PROD = "PROD"
 )
-const DEFAULT_MODE = DEV
+const DefaultAppMode = DEV
 
 // vars
 var (

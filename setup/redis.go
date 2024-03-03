@@ -2,13 +2,14 @@ package setup
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/shijiahao314/go-qa/global"
+	"go.uber.org/zap"
 )
 
 func initRedis() *redis.Client {
+	global.Logger.Info("start to init redis")
 	redisCfg := global.Config.Redis
 	client := redis.NewClient(&redis.Options{
 		Addr:     redisCfg.Addr,
@@ -18,10 +19,10 @@ func initRedis() *redis.Client {
 
 	pong, err := client.Ping(context.Background()).Result()
 	if err != nil {
-		slog.Error(err.Error())
+		global.Logger.Error("failed to init redis", zap.Error(err))
 		panic(err)
 	}
 
-	slog.Info("redis connect ping response:", slog.String("pong", pong))
+	global.Logger.Info("successfully init redis, ping response:", zap.String("pong", pong))
 	return client
 }

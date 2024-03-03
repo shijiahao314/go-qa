@@ -14,9 +14,9 @@ import (
 	"go.uber.org/zap"
 )
 
-type ChatApi struct{}
+type ChatAPI struct{}
 
-func (ca *ChatApi) Register(rg *gin.RouterGroup) {
+func (ca *ChatAPI) Register(rg *gin.RouterGroup) {
 	r := rg.Group("/chat")
 	// ChatInfo
 	r.POST("/chatInfo", ca.AddChatInfo)
@@ -34,7 +34,7 @@ func (ca *ChatApi) Register(rg *gin.RouterGroup) {
 
 // ChatInfo
 // AddChatInfo
-func (ca *ChatApi) AddChatInfo(c *gin.Context) {
+func (ca *ChatAPI) AddChatInfo(c *gin.Context) {
 	type AddChatInfoRequest struct {
 		Title string `json:"title"`
 	}
@@ -81,7 +81,7 @@ func (ca *ChatApi) AddChatInfo(c *gin.Context) {
 }
 
 // DeleteChatInfo
-func (ca *ChatApi) DeleteChatInfo(c *gin.Context) {
+func (ca *ChatAPI) DeleteChatInfo(c *gin.Context) {
 	type DeleteChatInfoRequest struct {
 	}
 	type DeleteChatInfoResponse struct {
@@ -112,7 +112,7 @@ func (ca *ChatApi) DeleteChatInfo(c *gin.Context) {
 }
 
 // UpdateChatInfo
-func (ca *ChatApi) UpdateChatInfo(c *gin.Context) {
+func (ca *ChatAPI) UpdateChatInfo(c *gin.Context) {
 	type UpdateChatInfoRequest struct {
 		Title string `json:"title"`
 	}
@@ -154,7 +154,7 @@ func (ca *ChatApi) UpdateChatInfo(c *gin.Context) {
 }
 
 // GetChatInfos: 获取当前用户所有的ChatInfo
-func (ca *ChatApi) GetChatInfos(c *gin.Context) {
+func (ca *ChatAPI) GetChatInfos(c *gin.Context) {
 	type GetChatInfosRequest struct {
 	}
 	type GetChatInfosResponse struct {
@@ -190,7 +190,7 @@ func (ca *ChatApi) GetChatInfos(c *gin.Context) {
 }
 
 // GetChatInfo
-func (ca *ChatApi) GetChatInfo(c *gin.Context) {
+func (ca *ChatAPI) GetChatInfo(c *gin.Context) {
 	type GetChatInfosRequest struct {
 	}
 	type GetChatInfosResponse struct {
@@ -226,7 +226,7 @@ func (ca *ChatApi) GetChatInfo(c *gin.Context) {
 
 // ChatCard
 // AddChatCard
-func (ca *ChatApi) AddChatCard(c *gin.Context) {
+func (ca *ChatAPI) AddChatCard(c *gin.Context) {
 	type AddChatCardRequest struct {
 		model.ChatCardDTO
 	}
@@ -263,7 +263,7 @@ func (ca *ChatApi) AddChatCard(c *gin.Context) {
 }
 
 // DeleteChatCard
-func (ca *ChatApi) DeleteChatCard(c *gin.Context) {
+func (ca *ChatAPI) DeleteChatCard(c *gin.Context) {
 	type DeleteChatCardRequest struct {
 	}
 	type DeleteChatCardResponse struct {
@@ -294,7 +294,7 @@ func (ca *ChatApi) DeleteChatCard(c *gin.Context) {
 }
 
 // UpdateChatCard
-func (ca *ChatApi) UpdateChatCard(c *gin.Context) {
+func (ca *ChatAPI) UpdateChatCard(c *gin.Context) {
 	type UpdateChatCardRequest struct {
 		model.ChatCardDTO
 	}
@@ -337,7 +337,7 @@ func (ca *ChatApi) UpdateChatCard(c *gin.Context) {
 }
 
 // GetChatCards
-func (ca *ChatApi) GetChatCards(c *gin.Context) {
+func (ca *ChatAPI) GetChatCards(c *gin.Context) {
 	type GetChatCardsRequest struct {
 	}
 	type GetChatCardsResponse struct {
@@ -375,7 +375,7 @@ func (ca *ChatApi) GetChatCards(c *gin.Context) {
 }
 
 // GetChatChard
-func (ca *ChatApi) GetChatCard(c *gin.Context) {
+func (ca *ChatAPI) GetChatCard(c *gin.Context) {
 	type GetChatCardRequest struct {
 	}
 	type GetChatCardResponse struct {

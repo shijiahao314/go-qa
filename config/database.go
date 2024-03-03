@@ -2,11 +2,11 @@ package config
 
 import "fmt"
 
-type Sqlite struct {
+type SqliteConfig struct {
 	Path string `mapstructure:"path" json:"path" yaml:"path"`
 }
 
-type Mysql struct {
+type MysqlConfig struct {
 	Username string `mapstructure:"username" json:"username" yaml:"username"`
 	Password string `mapstructure:"password" json:"password" yaml:"password"`
 	Path     string `mapstructure:"path" json:"path" yaml:"path"`
@@ -15,12 +15,19 @@ type Mysql struct {
 	Config   string `mapstructure:"config" json:"config" yaml:"config"`
 }
 
-func (m *Mysql) Dsn() string {
+func (m *MysqlConfig) Dsn() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?%s", m.Username, m.Password, m.Path, m.Port, m.Dbname, m.Config)
 }
 
-type Database struct {
-	Type   string `mapstructure:"type" json:"type" yaml:"type"`
-	Sqlite Sqlite `mapstructure:"sqlite" json:"sqlite" yaml:"sqlite"`
-	Mysql  Mysql  `mapstructure:"mysql" json:"mysql" yaml:"mysql"`
+type DatabaseType string
+
+const (
+	DatabaseTypeSqlite DatabaseType = "sqlite"
+	DatabaseTypeMysql  DatabaseType = "mysql"
+)
+
+type DatabaseConfig struct {
+	Type   DatabaseType `mapstructure:"type" json:"type" yaml:"type"`
+	Sqlite SqliteConfig `mapstructure:"sqlite" json:"sqlite" yaml:"sqlite"`
+	Mysql  MysqlConfig  `mapstructure:"mysql" json:"mysql" yaml:"mysql"`
 }
