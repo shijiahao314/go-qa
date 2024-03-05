@@ -34,6 +34,7 @@ func (cs *ChatService) AddChatInfo(chatInfo *model.ChatInfo) error {
 // Delete ChatInfo by id
 func (cs *ChatService) DeleteChatInfo(id uint) error {
 	tx := global.DB.Begin()
+	// defer tx.Rollback()
 
 	// 删除ChatInfo下的ChatCard
 	if err := global.DB.Where(&model.ChatCard{ChatInfoID: id}).Delete(&model.ChatCard{}).Error; err != nil {
