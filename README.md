@@ -12,7 +12,7 @@
 
 ## 部署运行
 
-### 使用Dockerfile只构建镜像（灵活性高）
+### 使用 Dockerfile
 
 ```bash
 # docker build -t <image_name>:<image_tag> <path_to_dockerfile>
@@ -21,7 +21,7 @@ docker run -itd --name qa-redis --restart always -p 6379:6379 redis --requirepas
 docker build -t go-qa:v1 .
 ```
 
-### 使用Docker Compose构建整套服务
+### 使用 Docker Compose
 
 ```bash
 # -d 在后台启动
