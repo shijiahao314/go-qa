@@ -85,3 +85,6 @@ Thumbs.db
 .vscode/launch.json
 config.*.yaml
 !config.example.yaml
+
+# bin file
+*/*
