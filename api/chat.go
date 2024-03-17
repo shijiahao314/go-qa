@@ -53,7 +53,7 @@ func (ca *ChatAPI) AddChatInfo(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
-	uid := c.GetString(global.USER_USER_ID_KEY)
+	uid := c.GetString(global.UserUserIDKey)
 	userid, err := utils.StringToUint64(uid)
 	if err != nil {
 		resp.Code = errcode.InternalServerError
@@ -160,7 +160,7 @@ func (ca *ChatAPI) GetChatInfos(c *gin.Context) {
 	}
 	resp := GetChatInfosResponse{}
 	// param
-	uid := c.GetString(global.USER_USER_ID_KEY)
+	uid := c.GetString(global.UserUserIDKey)
 	userid, err := utils.StringToUint64(uid)
 	if err != nil {
 		resp.Code = errcode.InternalServerError

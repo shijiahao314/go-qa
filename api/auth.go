@@ -112,7 +112,7 @@ func (aa *AuthAPI) Login(c *gin.Context) {
 	}
 	// session
 	session := sessions.Default(c)
-	if userInfo := session.Get(global.USER_INFO_KEY); userInfo != nil {
+	if userInfo := session.Get(global.UserInfoKey); userInfo != nil {
 		global.Logger.Info("already login", zap.String("username", req.Username))
 		resp.Code = errcode.Success
 		resp.Msg = "already login"
@@ -124,7 +124,7 @@ func (aa *AuthAPI) Login(c *gin.Context) {
 		Username: user.Username,
 		Role:     user.Role,
 	}
-	session.Set(global.USER_INFO_KEY, userInfo)
+	session.Set(global.UserInfoKey, userInfo)
 	if err := session.Save(); err != nil {
 		global.Logger.Info("failed to save session", zap.Error(err))
 		resp.Code = errcode.SessionSaveFailed
@@ -146,7 +146,7 @@ func (aa *AuthAPI) Logout(c *gin.Context) {
 	resp := LogoutResponse{}
 	// session
 	session := sessions.Default(c)
-	if userInfo := session.Get(global.USER_INFO_KEY); userInfo == nil {
+	if userInfo := session.Get(global.UserInfoKey); userInfo == nil {
 		resp.Code = errcode.NotLogin
 		resp.Msg = "not login"
 		c.JSON(http.StatusUnauthorized, resp)
@@ -176,7 +176,7 @@ func (aa *AuthAPI) IsLogin(c *gin.Context) {
 	res := IsLoginResponse{}
 	// session
 	session := sessions.Default(c)
-	uInfo := session.Get(global.USER_INFO_KEY)
+	uInfo := session.Get(global.UserInfoKey)
 	if uInfo == nil {
 		res.Code = errcode.NotLogin
 		res.Msg = "not login"
@@ -187,7 +187,7 @@ func (aa *AuthAPI) IsLogin(c *gin.Context) {
 	// success
 	res.Code = 0
 	res.Msg = "is login"
-	res.Username = userInfo[global.USER_USERNAME_KEY].(string)
+	res.Username = userInfo[global.UserUsernameKey].(string)
 	c.JSON(http.StatusOK, res)
 }
 

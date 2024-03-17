@@ -4,6 +4,7 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/shijiahao314/go-qa/config"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -26,16 +27,17 @@ var (
 	Logger   *zap.Logger      // Logger
 	Redis    *redis.Client    // Redis
 	Enforcer *casbin.Enforcer // casbin
+	Etcd     *clientv3.Client // etcd
 )
 
 const (
-	USER_INFO_KEY     = "user_info"
-	USER_USER_ID_KEY  = "userid"
-	USER_USERNAME_KEY = "username"
-	USER_ROLE_KEY     = "role"
+	UserInfoKey     = "user_info"
+	UserUserIDKey   = "userid"
+	UserUsernameKey = "username"
+	UserRoleKey     = "role"
 )
 
 const (
-	ROLE_ADMIN = "admin"
-	ROLE_USER  = "user"
+	RoleAdmin = "admin"
+	RoleUser  = "user"
 )

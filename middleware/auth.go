@@ -19,13 +19,13 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 		session := sessions.Default(c)
-		if uInfo := session.Get(global.USER_INFO_KEY); uInfo != nil {
+		if uInfo := session.Get(global.UserInfoKey); uInfo != nil {
 			userInfo := uInfo.(map[string]any)
-			username, ok := userInfo[global.USER_USERNAME_KEY].(string)
+			username, ok := userInfo[global.UserUsernameKey].(string)
 			if !ok {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 					"code": errcode.InternalServerError,
-					"msg":  fmt.Sprintf("key '%s' not in session", global.USER_USERNAME_KEY),
+					"msg":  fmt.Sprintf("key '%s' not in session", global.UserUsernameKey),
 				})
 				return
 			}
