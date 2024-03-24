@@ -55,7 +55,7 @@ func (us *UserService) UpdateUser(u model.User) error {
 	var user model.User
 	tx := global.DB.Begin()
 
-	if err := tx.Model(&model.User{}).Where("id = ?", u.UserID).Take(&user).Error; err != nil {
+	if err := tx.Model(&model.User{}).Where("user_id = ?", u.UserID).Take(&user).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -71,7 +71,7 @@ func (us *UserService) UpdateUser(u model.User) error {
 		user.Role = u.Role
 	}
 
-	if err := tx.Model(&model.User{}).Where("id = ?", u.UserID).Save(&user).Error; err != nil {
+	if err := tx.Model(&model.User{}).Where("user_id = ?", u.UserID).Save(&user).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -90,10 +90,18 @@ func (us *UserService) UsernameExists(username string) (bool, error) {
 
 func (us *UserService) GithubUserExists(id uint64) (bool, error) {
 	var cnt int64
-	if err := global.DB.Model(&model.GithubUser{}).Where("id = ?", id).Count(&cnt).Error; err != nil {
+	if err := global.DB.Model(&model.GithubUser{}).Where("user_id = ?", id).Count(&cnt).Error; err != nil {
 		return false, err
 	}
 	return cnt > 0, nil
+}
+
+func (us *UserService) GetUser(id uint64) (*model.User, error) {
+	var user model.User
+	if err := global.DB.Model(&model.User{}).Where("user_id = ?", id).Take(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (us *UserService) GetUsers(page, size int) ([]model.User, int64, error) {

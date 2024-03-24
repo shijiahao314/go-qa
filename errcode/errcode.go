@@ -31,9 +31,11 @@ const (
 	AddUserFailed
 	// delete
 	DeleteUserFailed
-	GetUsersFailed
+	// update
 	UpdateUserFailed
-	PermissionDenied
+	// get
+	GetUserFailed
+	GetUsersFailed
 )
 
 // chat

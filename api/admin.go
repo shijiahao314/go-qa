@@ -19,7 +19,8 @@ type AdminAPI struct{}
 func (aa *AdminAPI) Register(rg *gin.RouterGroup) {
 	r := rg.Group("/admin")
 	// User
-	r.GET("/user", aa.GetUsers)
+	r.GET("/user", aa.GetCurrentUser)
+	r.GET("/users", aa.GetUsers)
 	r.POST("/user", aa.AddUser)
 	r.POST("/user/:id", aa.UpdateUser)
 	r.DELETE("/user/:id", aa.DeleteUser)
@@ -124,7 +125,7 @@ func (aa *AdminAPI) UpdateUser(c *gin.Context) {
 	// param
 	id, err := utils.StringToUint64(c.Param("id"))
 	if err != nil {
-		global.Logger.Info("invalid request", zap.Error(err))
+		global.Logger.Error("invalid request", zap.Error(err))
 		res.Code = errcode.InvalidRequest
 		res.Msg = err.Error()
 		c.JSON(http.StatusBadRequest, res)
@@ -132,7 +133,7 @@ func (aa *AdminAPI) UpdateUser(c *gin.Context) {
 	}
 	// json
 	if err := c.ShouldBindJSON(&req); err != nil {
-		global.Logger.Info("invalid request", zap.Error(err))
+		global.Logger.Error("invalid request", zap.Error(err))
 		res.Code = errcode.UpdateUserFailed
 		res.Msg = err.Error()
 		c.JSON(http.StatusBadRequest, res)
@@ -144,7 +145,7 @@ func (aa *AdminAPI) UpdateUser(c *gin.Context) {
 	updatedUser.Role = req.Role
 	us := new(service.UserService)
 	if err := us.UpdateUser(updatedUser); err != nil {
-		global.Logger.Info("update user failed", zap.Error(err))
+		global.Logger.Error("update user failed", zap.Error(err))
 		res.Code = errcode.UpdateUserFailed
 		res.Msg = err.Error()
 		c.JSON(http.StatusInternalServerError, res)
@@ -157,6 +158,49 @@ func (aa *AdminAPI) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// GetCurrentUser retrieves the current user information from the AdminAPI.
+func (aa *AdminAPI) GetCurrentUser(c *gin.Context) {
+	type GetCurrentUserResponse struct {
+		BaseResponse
+		Data struct {
+			UserInfo model.UserDTO `json:"user_info"`
+		} `json:"data"`
+	}
+	res := GetCurrentUserResponse{}
+	// param
+	userid := c.GetString(global.UserUserIDKey)
+	// service
+	id, err := utils.StringToUint64(userid)
+	if err != nil {
+		global.Logger.Error("invalid request", zap.Error(err))
+		res.Code = errcode.InvalidRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	us := new(service.UserService)
+	user, err := us.GetUser(id)
+	if err != nil {
+		global.Logger.Error("failed to get current user", zap.Error(err))
+		res.Code = errcode.GetUserFailed
+		res.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, res)
+		return
+	}
+	// success
+	global.Logger.Info("success get user", zap.Uint64("userid", id))
+	res.Code = errcode.Success
+	res.Msg = errmsg.Success
+	userInfo := model.UserDTO{
+		UserID:   user.UserID,
+		Username: user.Username,
+		Role:     user.Role,
+	}
+	res.Data.UserInfo = userInfo
+	c.JSON(http.StatusOK, res)
+}
+
+// GetUsers retrieves users and their information.
 func (aa *AdminAPI) GetUsers(c *gin.Context) {
 	type GetUsersResponse struct {
 		BaseResponse
@@ -174,7 +218,7 @@ func (aa *AdminAPI) GetUsers(c *gin.Context) {
 	us := new(service.UserService)
 	users, total, err := us.GetUsers(page, size)
 	if err != nil {
-		global.Logger.Info("failed to get users", zap.Error(err))
+		global.Logger.Error("failed to get users", zap.Error(err))
 		res.Code = errcode.GetUsersFailed
 		res.Msg = err.Error()
 		c.JSON(http.StatusInternalServerError, res)

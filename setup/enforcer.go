@@ -26,7 +26,6 @@ func initEnforcer() *casbin.Enforcer {
 	e.AddPolicy("admin", "/api/*")
 	e.AddPolicy("user", "/api/chat/*")
 	e.AddPolicy("user", "/api/settings/*")
-	// e.AddPolicy("user", "/api/chat/*")
 	// e.AddGroupingPolicy("alice", "admin")
 	e.SavePolicy()
 
