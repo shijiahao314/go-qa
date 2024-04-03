@@ -12,6 +12,7 @@ require (
 	github.com/gorilla/websocket v1.5.1
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/spf13/viper v1.16.0
+	go.etcd.io/etcd/client/v3 v3.5.12
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.19.0
 	golang.org/x/oauth2 v0.17.0
@@ -19,11 +20,6 @@ require (
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/driver/sqlite v1.5.3
 	gorm.io/gorm v1.25.5
-)
-
-require (
-	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
-	github.com/coreos/pkg v0.0.0-20240122114842-bbd7aa9bf6fb // indirect
 )
 
 require (
@@ -87,7 +83,6 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.12 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.12 // indirect
-	go.etcd.io/etcd/client/v3 v3.5.12 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.6.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
