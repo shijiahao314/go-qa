@@ -1,4 +1,4 @@
-package setup
+package bootstrap
 
 import (
 	"github.com/casbin/casbin/v2"

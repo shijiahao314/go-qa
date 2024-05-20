@@ -1,4 +1,4 @@
-package setup
+package bootstrap
 
 import (
 	"os"
@@ -22,11 +22,11 @@ func InitMode() {
 	mode, ok := os.LookupEnv("MODE")
 	if ok {
 		switch mode {
-		case global.TEST:
+		case string(global.TEST):
 			global.Mode = global.TEST
-		case global.DEV:
+		case string(global.DEV):
 			global.Mode = global.DEV
-		case global.PROD:
+		case string(global.PROD):
 			global.Mode = global.PROD
 		}
 	} else {
@@ -55,7 +55,7 @@ func InitViper() {
 		configFile = PROD_CONFIG_FILE
 	}
 
-	slog.Info("config file", slog.String("path", configFile), slog.String("mode", mode))
+	slog.Info("config file", slog.String("path", configFile), slog.String("mode", string(mode)))
 
 	v.SetConfigFile(configFile)
 	v.SetConfigType("yaml")

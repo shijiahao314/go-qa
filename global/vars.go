@@ -12,9 +12,9 @@ import (
 type ModeType string
 
 const (
-	TEST = "TEST"
-	DEV  = "DEV"
-	PROD = "PROD"
+	TEST ModeType = "TEST"
+	DEV  ModeType = "DEV"
+	PROD ModeType = "PROD"
 )
 const DEFAULT_MODE = DEV
 

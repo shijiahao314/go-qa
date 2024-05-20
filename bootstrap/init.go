@@ -1,4 +1,4 @@
-package setup
+package bootstrap
 
 import (
 	"github.com/shijiahao314/go-qa/global"
@@ -6,7 +6,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func Setup() {
+// 必须初始化
+func MustInit() {
 	// 初始化配置文件（首先）
 	InitViper()
 	// 初始化Logger
@@ -20,5 +21,5 @@ func Setup() {
 
 	// setup success info
 	global.Logger.Info("success setup",
-		zap.String("global.Mode", helper.GetMode()))
+		zap.String("global.Mode", string(helper.GetMode())))
 }
