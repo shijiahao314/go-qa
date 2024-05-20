@@ -11,13 +11,13 @@ import (
 type ChatService struct{}
 
 // Check userId是否与ChatInfo.UserID匹配
-func (cs *ChatService) CheckUser(userId uint64, id uint) error {
+func (cs *ChatService) CheckUser(userID uint64, id uint) error {
 	var chatInfo model.ChatInfo
 	if err := global.DB.Model(&model.ChatInfo{}).Where(&model.ChatInfo{ID: id}).Take(&chatInfo).Error; err != nil {
 		return err
 	}
-	if userId != chatInfo.UserID {
-		return fmt.Errorf("user id [%d] does not match chat info user id [%d]", userId, chatInfo.UserID)
+	if userID != chatInfo.UserID {
+		return fmt.Errorf("user id [%d] does not match chat info user id [%d]", userID, chatInfo.UserID)
 	}
 	return nil
 }
@@ -34,6 +34,7 @@ func (cs *ChatService) AddChatInfo(chatInfo *model.ChatInfo) error {
 // Delete ChatInfo by id
 func (cs *ChatService) DeleteChatInfo(id uint) error {
 	tx := global.DB.Begin()
+	// defer tx.Rollback()
 
 	// 删除ChatInfo下的ChatCard
 	if err := global.DB.Where(&model.ChatCard{ChatInfoID: id}).Delete(&model.ChatCard{}).Error; err != nil {

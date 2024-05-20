@@ -7,7 +7,7 @@ import (
 	"github.com/shijiahao314/go-qa/middleware"
 )
 
-type Router interface {
+type IRouter interface {
 	Register(r *gin.RouterGroup)
 }
 
@@ -25,23 +25,23 @@ func Register(r *gin.Engine) {
 	// 	AllowCredentials: true,
 	// 	MaxAge:           12 * time.Hour,
 	// }))
+
+	// apiRouter
 	apiRouter.Use(cors.Default(), middleware.Auth())
-
-	rts1 := []Router{
-		&api.AdminApi{},
-		&api.ChatApi{},
+	rts1 := []IRouter{
+		&api.AdminAPI{},
+		&api.ChatAPI{},
 		&api.ChatWSApi{},
-		&api.SettingApi{},
+		&api.SettingAPI{},
 	}
-
 	for _, rt := range rts1 {
 		rt.Register(apiRouter)
 	}
 
-	rts2 := []Router{
-		&api.AuthApi{},
+	// authRouter
+	rts2 := []IRouter{
+		&api.AuthAPI{},
 	}
-
 	for _, rt := range rts2 {
 		rt.Register(authRouter)
 	}

@@ -9,13 +9,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/global"
-	"github.com/shijiahao314/go-qa/helper"
 	"github.com/spf13/viper"
 )
 
 const (
-	DEV_CONFIG_FILE  = "config.dev.yaml"
-	PROD_CONFIG_FILE = "config.prod.yaml"
+	DevConfigFile  = "config.dev.yaml"
+	ProdConfigFile = "config.prod.yaml"
 )
 
 func InitMode() {
@@ -30,29 +29,29 @@ func InitMode() {
 			global.Mode = global.PROD
 		}
 	} else {
-		global.Mode = global.DEFAULT_MODE
+		global.Mode = global.DefaultAppMode
 	}
 }
 
 func InitViper() {
 	InitMode()
-	mode := helper.GetMode()
+	mode := global.Mode
 
 	v := viper.New()
-	configFile := DEV_CONFIG_FILE
+	configFile := DevConfigFile
 
 	switch mode {
 	case global.TEST:
 		gin.SetMode(gin.TestMode)
 		_, b, _, _ := runtime.Caller(0)
 		path := filepath.Dir(filepath.Dir(b))
-		configFile = filepath.Join(path, DEV_CONFIG_FILE)
+		configFile = filepath.Join(path, DevConfigFile)
 	case global.DEV:
 		gin.SetMode(gin.DebugMode)
-		configFile = DEV_CONFIG_FILE
+		configFile = DevConfigFile
 	case global.PROD:
 		gin.SetMode(gin.ReleaseMode)
-		configFile = PROD_CONFIG_FILE
+		configFile = ProdConfigFile
 	}
 
 	slog.Info("config file", slog.String("path", configFile), slog.String("mode", string(mode)))

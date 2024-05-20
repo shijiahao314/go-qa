@@ -25,7 +25,7 @@ func (ca *ChatWSApi) Register(rg *gin.RouterGroup) {
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
+	CheckOrigin:     func(*http.Request) bool { return true },
 }
 
 const (
@@ -69,6 +69,7 @@ func (ca *ChatWSApi) ChatWebSocket(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		global.Logger.Error("failed to upgrade websocket", zap.Error(err))
+		return
 	}
 	ticker := time.NewTicker(pingPeriod)
 	// defer close
@@ -83,10 +84,9 @@ func (ca *ChatWSApi) ChatWebSocket(c *gin.Context) {
 
 	for {
 		var rcvMsg WSChatReceiveMessage
-		err := conn.ReadJSON(&rcvMsg)
-		if err != nil {
+		if err := conn.ReadJSON(&rcvMsg); err != nil {
 			global.Logger.Error("failed to read message", zap.Error(err))
-			break
+			return
 		}
 		fmt.Printf("receive: %+v\n", rcvMsg)
 		if rcvMsg.Type == GetMsgs {

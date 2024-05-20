@@ -18,6 +18,8 @@ func MustInit() {
 	global.Redis = initRedis()
 	// 初始化casbin
 	global.Enforcer = initEnforcer()
+	// 初始化etcd
+	global.Etcd = initEtcd()
 
 	// setup success info
 	global.Logger.Info("success setup",

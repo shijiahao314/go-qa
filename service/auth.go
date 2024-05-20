@@ -25,9 +25,9 @@ func (as *AuthService) Login(username, password string) (model.User, error) {
 	return user, nil
 }
 
-func (as *AuthService) UserIDInDatabase(userId uint64) (bool, error) {
+func (as *AuthService) UserIDInDatabase(userID uint64) (bool, error) {
 	var user model.User
-	if err := global.DB.Model(&model.User{}).Where("user_id = ?", userId).First(&user).Error; err != nil {
+	if err := global.DB.Model(&model.User{}).Where("user_id = ?", userID).First(&user).Error; err != nil {
 		return false, err
 	}
 	return true, nil
@@ -38,7 +38,7 @@ func (as *AuthService) UserHasPermission(userid uint64) (bool, error) {
 	if err := global.DB.Model(&model.User{}).Where("user_id = ?", userid).First(&user).Error; err != nil {
 		return false, err
 	}
-	if user.Role == global.ROLE_ADMIN {
+	if user.Role == global.RoleAdmin {
 		return true, nil
 	}
 	return false, nil

@@ -6,23 +6,24 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/errcode"
+	"github.com/shijiahao314/go-qa/errmsg"
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
 	"github.com/shijiahao314/go-qa/service"
 	"github.com/shijiahao314/go-qa/utils"
 )
 
-type SettingApi struct {
+type SettingAPI struct {
 }
 
-func (ca *SettingApi) Register(rg *gin.RouterGroup) {
-	r := rg.Group("/setting")
+func (ca *SettingAPI) Register(rg *gin.RouterGroup) {
+	r := rg.Group("/settings")
 	// Setting
-	r.POST("/setting", ca.UpdateSetting)
-	r.GET("/setting", ca.GetSetting)
+	r.POST("/settings", ca.UpdateSetting)
+	r.GET("/settings", ca.GetSetting)
 }
 
-func (ca *SettingApi) checkChatModel(chatModel model.ChatModel) error {
+func (ca *SettingAPI) checkChatModel(chatModel model.ChatModel) error {
 	switch chatModel {
 	case "gpt-3.5-turbo":
 		return nil
@@ -33,7 +34,7 @@ func (ca *SettingApi) checkChatModel(chatModel model.ChatModel) error {
 
 // Setting
 // UpdateSetting
-func (ca *SettingApi) UpdateSetting(c *gin.Context) {
+func (ca *SettingAPI) UpdateSetting(c *gin.Context) {
 	type UpdateSettingRequest struct {
 		model.UserSettingDTO
 	}
@@ -56,7 +57,7 @@ func (ca *SettingApi) UpdateSetting(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
-	uid := c.GetString(global.USER_USER_ID_KEY)
+	uid := c.GetString(global.UserUserIDKey)
 	userid, err := utils.StringToUint64(uid)
 	if err != nil {
 		resp.Code = errcode.InternalServerError
@@ -73,22 +74,20 @@ func (ca *SettingApi) UpdateSetting(c *gin.Context) {
 		return
 	}
 	// success
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	c.JSON(http.StatusOK, resp)
 }
 
 // GetSetting
-func (ca *SettingApi) GetSetting(c *gin.Context) {
-	type GetSettingRequest struct{}
+func (ca *SettingAPI) GetSetting(c *gin.Context) {
 	type GetSettingResponse struct {
 		BaseResponse
 		UserSettingDTO model.UserSettingDTO `json:"setting"`
 	}
-	// req := GetSettingRequest{}
 	resp := GetSettingResponse{}
 	// param
-	uid := c.GetString(global.USER_USER_ID_KEY)
+	uid := c.GetString(global.UserUserIDKey)
 	userid, err := utils.StringToUint64(uid)
 	if err != nil {
 		resp.Code = errcode.InternalServerError
@@ -106,8 +105,8 @@ func (ca *SettingApi) GetSetting(c *gin.Context) {
 		return
 	}
 	// success
-	resp.Code = 0
-	resp.Msg = "success"
+	resp.Code = errcode.Success
+	resp.Msg = errmsg.Success
 	resp.UserSettingDTO.OpenaiApiKey = setting.OpenaiApiKey
 	resp.UserSettingDTO.ChatModel = setting.ChatModel
 	resp.UserSettingDTO.TestMode = setting.TestMode

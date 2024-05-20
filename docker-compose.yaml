@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  mysql:
+    container_name: nextqa-mysql
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: qa-mysql-password
+      MYSQL_DATABASE: qa
+    ports:
+      - "127.0.0.1:3306:3306"
+    networks:
+      - qa_network
+
+  redis:
+    container_name: nextqa-redis
+    image: redis:latest
+    environment:
+      REDIS_PASSWORD: qa-redis-password
+    networks:
+      - qa_network
+
+  qa_backend:
+    container_name: nextqa-backend
+    image: golang:1.21.1
+    volumes:
+      - ".:/go/src/qa-backend"
+    working_dir: /go/src/qa-backend
+    command: go run main.go
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - qa_network
+
+networks:
+  qa_network:
+    driver: bridge

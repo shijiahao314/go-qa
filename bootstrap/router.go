@@ -1,13 +1,12 @@
 package bootstrap
 
 import (
-	"log/slog"
-
 	"github.com/boj/redistore"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	// gSessions "github.com/gorilla/sessions"
 	"github.com/shijiahao314/go-qa/global"
@@ -15,8 +14,8 @@ import (
 )
 
 const (
-	HEALTH_PATH = "/api/health"
-	SECRET_KEY  = "iV6pNvjdHVUVc5Q*Wi4S&" // random
+	HealthPath = "/api/health"
+	SecretKey  = "iV6pNvjdHVUVc5Q*Wi4S&" // random
 )
 
 // type MySerializer struct{}
@@ -59,16 +58,15 @@ func InitRouter() *gin.Engine {
 		"tcp",
 		global.Config.Redis.Addr,
 		global.Config.Redis.Password,
-		[]byte(SECRET_KEY),
+		[]byte(SecretKey),
 	)
 	if err != nil {
-		slog.Error(err.Error())
+		global.Logger.Error("failed to init redis", zap.Error(err))
 		panic(err)
 	}
 	_, rs := redis.GetRedisStore(store)
 
 	rs.SetSerializer(redistore.JSONSerializer{})
-	// rs.SetSerializer(MySerializer{})
 
 	store.Options(sessions.Options{
 		Path:     "/",
@@ -79,13 +77,13 @@ func InitRouter() *gin.Engine {
 	r.Use(sessions.Sessions("session", store))
 
 	r.Use(
-		gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{HEALTH_PATH}}),
+		gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{HealthPath}}),
 		gin.Recovery(),
 	)
 
 	r.Use(cors.Default())
 
-	r.GET(HEALTH_PATH, func(ctx *gin.Context) {})
+	r.GET(HealthPath, func(*gin.Context) {})
 
 	router.Register(r)
 

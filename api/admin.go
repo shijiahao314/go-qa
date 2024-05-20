@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/errcode"
+	"github.com/shijiahao314/go-qa/errmsg"
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
 	"github.com/shijiahao314/go-qa/service"
@@ -13,18 +14,19 @@ import (
 	"go.uber.org/zap"
 )
 
-type AdminApi struct{}
+type AdminAPI struct{}
 
-func (aa *AdminApi) Register(rg *gin.RouterGroup) {
+func (aa *AdminAPI) Register(rg *gin.RouterGroup) {
 	r := rg.Group("/admin")
 	// User
-	r.GET("/user", aa.GetUsers)
+	r.GET("/user", aa.GetCurrentUser)
+	r.GET("/users", aa.GetUsers)
 	r.POST("/user", aa.AddUser)
 	r.POST("/user/:id", aa.UpdateUser)
 	r.DELETE("/user/:id", aa.DeleteUser)
 }
 
-func (aa *AdminApi) AddUser(c *gin.Context) {
+func (aa *AdminAPI) AddUser(c *gin.Context) {
 	type AddUserRequest struct {
 		Username string         `json:"username"`
 		Password string         `json:"password"`
@@ -43,13 +45,15 @@ func (aa *AdminApi) AddUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
-	newUser := model.User{}
-	newUser.Username = req.Username
-	newUser.Password = req.Password
-	newUser.Role = req.Role
+	newUser := model.User{
+		AccountType: model.AccountTypeBase,
+		Username:    req.Username,
+		Password:    req.Password,
+		Role:        req.Role,
+	}
 	// service
 	us := new(service.UserService)
-	ok, err := us.UserExists(newUser.Username)
+	ok, err := us.UsernameExists(newUser.Username)
 	if err != nil {
 		global.Logger.Info("failed to check user exists", zap.Error(err))
 		res.Code = errcode.InternalServerError
@@ -72,18 +76,15 @@ func (aa *AdminApi) AddUser(c *gin.Context) {
 		return
 	}
 	// success
-	res.Code = 0
-	res.Msg = "success"
+	res.Code = errcode.Success
+	res.Msg = errmsg.Success
 	c.JSON(http.StatusOK, res)
 }
 
-func (aa *AdminApi) DeleteUser(c *gin.Context) {
-	type DeleteUserRequest struct {
-	}
+func (aa *AdminAPI) DeleteUser(c *gin.Context) {
 	type DeleteUserResponse struct {
 		BaseResponse
 	}
-	// req := DeleteUserRequest{}
 	res := DeleteUserResponse{}
 	// param
 	id, err := utils.StringToUint64(c.Param("id"))
@@ -105,12 +106,12 @@ func (aa *AdminApi) DeleteUser(c *gin.Context) {
 	}
 	// success
 	global.Logger.Info("success delete user", zap.Uint64("id", id))
-	res.Code = 0
-	res.Msg = "success"
+	res.Code = errcode.Success
+	res.Msg = errmsg.Success
 	c.JSON(http.StatusOK, res)
 }
 
-func (aa *AdminApi) UpdateUser(c *gin.Context) {
+func (aa *AdminAPI) UpdateUser(c *gin.Context) {
 	type UpdateUserRequest struct {
 		// Username string `json:"username"` // 不允许修改用户名
 		Password string         `json:"password"`
@@ -124,7 +125,7 @@ func (aa *AdminApi) UpdateUser(c *gin.Context) {
 	// param
 	id, err := utils.StringToUint64(c.Param("id"))
 	if err != nil {
-		global.Logger.Info("invalid request", zap.Error(err))
+		global.Logger.Error("invalid request", zap.Error(err))
 		res.Code = errcode.InvalidRequest
 		res.Msg = err.Error()
 		c.JSON(http.StatusBadRequest, res)
@@ -132,7 +133,7 @@ func (aa *AdminApi) UpdateUser(c *gin.Context) {
 	}
 	// json
 	if err := c.ShouldBindJSON(&req); err != nil {
-		global.Logger.Info("invalid request", zap.Error(err))
+		global.Logger.Error("invalid request", zap.Error(err))
 		res.Code = errcode.UpdateUserFailed
 		res.Msg = err.Error()
 		c.JSON(http.StatusBadRequest, res)
@@ -144,7 +145,7 @@ func (aa *AdminApi) UpdateUser(c *gin.Context) {
 	updatedUser.Role = req.Role
 	us := new(service.UserService)
 	if err := us.UpdateUser(updatedUser); err != nil {
-		global.Logger.Info("update user failed", zap.Error(err))
+		global.Logger.Error("update user failed", zap.Error(err))
 		res.Code = errcode.UpdateUserFailed
 		res.Msg = err.Error()
 		c.JSON(http.StatusInternalServerError, res)
@@ -152,14 +153,55 @@ func (aa *AdminApi) UpdateUser(c *gin.Context) {
 	}
 	// success
 	global.Logger.Info("success update user", zap.Uint64("userid", id))
-	res.Code = 0
-	res.Msg = "success"
+	res.Code = errcode.Success
+	res.Msg = errmsg.Success
 	c.JSON(http.StatusOK, res)
 }
 
-func (aa *AdminApi) GetUsers(c *gin.Context) {
-	type GetUsersRequest struct {
+// GetCurrentUser retrieves the current user information from the AdminAPI.
+func (aa *AdminAPI) GetCurrentUser(c *gin.Context) {
+	type GetCurrentUserResponse struct {
+		BaseResponse
+		Data struct {
+			UserInfo model.UserDTO `json:"user_info"`
+		} `json:"data"`
 	}
+	res := GetCurrentUserResponse{}
+	// param
+	userid := c.GetString(global.UserUserIDKey)
+	// service
+	id, err := utils.StringToUint64(userid)
+	if err != nil {
+		global.Logger.Error("invalid request", zap.Error(err))
+		res.Code = errcode.InvalidRequest
+		res.Msg = err.Error()
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	us := new(service.UserService)
+	user, err := us.GetUser(id)
+	if err != nil {
+		global.Logger.Error("failed to get current user", zap.Error(err))
+		res.Code = errcode.GetUserFailed
+		res.Msg = err.Error()
+		c.JSON(http.StatusInternalServerError, res)
+		return
+	}
+	// success
+	global.Logger.Info("success get user", zap.Uint64("userid", id))
+	res.Code = errcode.Success
+	res.Msg = errmsg.Success
+	userInfo := model.UserDTO{
+		UserID:   user.UserID,
+		Username: user.Username,
+		Role:     user.Role,
+	}
+	res.Data.UserInfo = userInfo
+	c.JSON(http.StatusOK, res)
+}
+
+// GetUsers retrieves users and their information.
+func (aa *AdminAPI) GetUsers(c *gin.Context) {
 	type GetUsersResponse struct {
 		BaseResponse
 		Data struct {
@@ -169,7 +211,6 @@ func (aa *AdminApi) GetUsers(c *gin.Context) {
 			UserInfos []model.UserDTO `json:"user_infos"`
 		} `json:"data"`
 	}
-	// req := GetUsersRequest{}
 	res := GetUsersResponse{}
 	// param
 	page, size := getPageAndSize(c)
@@ -177,7 +218,7 @@ func (aa *AdminApi) GetUsers(c *gin.Context) {
 	us := new(service.UserService)
 	users, total, err := us.GetUsers(page, size)
 	if err != nil {
-		global.Logger.Info("failed to get users", zap.Error(err))
+		global.Logger.Error("failed to get users", zap.Error(err))
 		res.Code = errcode.GetUsersFailed
 		res.Msg = err.Error()
 		c.JSON(http.StatusInternalServerError, res)
@@ -185,17 +226,17 @@ func (aa *AdminApi) GetUsers(c *gin.Context) {
 	}
 	// success
 	global.Logger.Info("success get users")
-	res.Code = 0
-	res.Msg = "success"
+	res.Code = errcode.Success
+	res.Msg = errmsg.Success
 	res.Data.Page = page
 	res.Data.Size = size
 	res.Data.Total = total
 	var usersInfos []model.UserDTO
-	for _, u := range users {
+	for i := range users {
 		usersInfos = append(usersInfos, model.UserDTO{
-			UserID:   u.UserID,
-			Username: u.Username,
-			Role:     u.Role,
+			UserID:   users[i].UserID,
+			Username: users[i].Username,
+			Role:     users[i].Role,
 		})
 	}
 	res.Data.UserInfos = usersInfos
