@@ -31,4 +31,4 @@ redis:
 oauth:
   github:
     client-id: "xxx"
-    client_secret: "xxxxx"
+    client-secret: "xxxxx"

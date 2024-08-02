@@ -4,6 +4,6 @@ import (
 	"github.com/shijiahao314/go-qa/global"
 )
 
-func GetMode() global.ModeType {
+func GetMode() global.AppMode {
 	return global.Mode
 }

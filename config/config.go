@@ -7,5 +7,5 @@ type Config struct {
 	Database    DatabaseConfig `mapstructure:"database" json:"database" yaml:"database"`
 	Redis       RedisConfig    `mapstructure:"redis" json:"redis" yaml:"redis"`
 	OAuthConfig OAuthConfig    `mapstructure:"oauth" json:"oauth" yaml:"oauth"`
-	Etcd        EtcdConfig     `mapstructure:"etcd" json:"etcd" yaml:"etcd"`
+	// Etcd        EtcdConfig     `mapstructure:"etcd" json:"etcd" yaml:"etcd"`
 }

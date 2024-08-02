@@ -13,9 +13,9 @@ import (
 type AppMode string
 
 const (
-	TEST ModeType = "TEST"
-	DEV  ModeType = "DEV"
-	PROD ModeType = "PROD"
+	TEST AppMode = "TEST"
+	DEV  AppMode = "DEV"
+	PROD AppMode = "PROD"
 )
 const DefaultAppMode = DEV
 

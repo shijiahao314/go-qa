@@ -19,7 +19,7 @@ func MustInit() {
 	// 初始化casbin
 	global.Enforcer = initEnforcer()
 	// 初始化etcd
-	global.Etcd = initEtcd()
+	// global.Etcd = initEtcd()
 
 	// setup success info
 	global.Logger.Info("success setup",
