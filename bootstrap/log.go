@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/shijiahao314/go-qa/global"
@@ -9,28 +11,25 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-func PathExists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
-}
+// mustInitZap 初始化 Logger
+func mustInitZap() *zap.Logger {
+	slog.Info("start to init logger")
+	defer slog.Info("success init logger")
 
-func initZap() *zap.Logger {
 	var encoderConfig zapcore.EncoderConfig
-	switch global.Mode {
+	mode := global.Mode
+	switch mode {
+	case global.TEST:
+		encoderConfig = zap.NewDevelopmentEncoderConfig()
 	case global.DEV:
 		encoderConfig = zap.NewDevelopmentEncoderConfig()
 	case global.PROD:
 		encoderConfig = zap.NewProductionEncoderConfig()
 	default:
-		encoderConfig = zap.NewDevelopmentEncoderConfig()
+		slog.Error("invalid mode", slog.String("mode", string(mode)))
+		panic(fmt.Sprintf("invalid mode: %s", mode))
 	}
-	// output1: file
+	// 日志输出流1: 日志文件
 	fileCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(encoderConfig),
 		zapcore.AddSync(&lumberjack.Logger{
@@ -41,16 +40,13 @@ func initZap() *zap.Logger {
 		}),
 		zap.DebugLevel,
 	)
-	// output2: console
+	// 日志输出流2: 控制台
 	consoleCore := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(encoderConfig),
 		zapcore.Lock(os.Stdout),
 		zapcore.DebugLevel,
 	)
 	logger := zap.New(zapcore.NewTee(fileCore, consoleCore))
-	// logger, err := zap.NewDevelopment(zap.AddCaller())
-	// if err != nil {
-	// 	panic(err)
-	// }
+
 	return logger
 }

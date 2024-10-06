@@ -1,12 +1,13 @@
 package bootstrap
 
 import (
+	"log/slog"
+
 	"github.com/boj/redistore"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 
 	// gSessions "github.com/gorilla/sessions"
 	"github.com/shijiahao314/go-qa/global"
@@ -49,7 +50,8 @@ const (
 // 	return nil
 // }
 
-func InitRouter() *gin.Engine {
+// MustInitRouter 初始化路由配置
+func MustInitRouter() *gin.Engine {
 	r := gin.New()
 
 	// session
@@ -61,7 +63,7 @@ func InitRouter() *gin.Engine {
 		[]byte(SecretKey),
 	)
 	if err != nil {
-		global.Logger.Error("failed to init redis", zap.Error(err))
+		slog.Error("failed to init redis", slog.String("err", err.Error()))
 		panic(err)
 	}
 	_, rs := redis.GetRedisStore(store)

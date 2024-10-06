@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// AppMode
+// AppMode 运行模式
 type AppMode string
 
 const (
@@ -17,6 +17,8 @@ const (
 	DEV  AppMode = "DEV"
 	PROD AppMode = "PROD"
 )
+
+// DefaultAppMode 默认运行模式
 const DefaultAppMode = DEV
 
 // vars

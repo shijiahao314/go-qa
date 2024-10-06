@@ -10,8 +10,9 @@ import (
 
 func main() {
 	bootstrap.MustInit()
+	bootstrap.Init()
 
-	r := bootstrap.InitRouter()
+	r := bootstrap.MustInitRouter()
 	if err := r.Run(fmt.Sprintf("0.0.0.0:%d", global.Config.Port)); err != nil {
 		global.Logger.Error("failed to run server",
 			zap.String("host", "0.0.0.0"),

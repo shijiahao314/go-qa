@@ -1,26 +1,32 @@
 package bootstrap
 
 import (
+	"fmt"
+	"log/slog"
+
 	"github.com/shijiahao314/go-qa/config"
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/model"
-	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func initDB() *gorm.DB {
-	global.Logger.Info("start to init database", zap.String("type", string(global.Config.Database.Type)))
+// initDB 初始化数据库
+func mustInitDB() *gorm.DB {
+	databaseType := global.Config.Database.Type
+	slog.Info("start to init database", slog.String("type", string(databaseType)))
+	defer slog.Info("success init database")
+
 	var db *gorm.DB
-	switch global.Config.Database.Type {
+	switch databaseType {
 	case config.DatabaseTypeSqlite:
 		db = initSqlite()
 	case config.DatabaseTypeMysql:
 		db = initMysql()
 	default:
-		global.Logger.Error("unsupported database type", zap.String("type", string(global.Config.Database.Type)))
-		panic("unsupported database type")
+		slog.Error("unsupported database", slog.String("type", string(databaseType)))
+		panic(fmt.Sprintf("unsupported database type: %s", databaseType))
 	}
 
 	// 自动建表
@@ -31,27 +37,31 @@ func initDB() *gorm.DB {
 		&model.UserSetting{},
 	)
 	if err != nil {
-		global.Logger.Error("failed during automigration", zap.Error(err))
+		slog.Error("failed during automigration", slog.String("err", err.Error()))
 		panic(err)
 	}
-	global.Logger.Info("successfully init database")
+
 	return db
 }
 
 func initSqlite() *gorm.DB {
-	global.Logger.Info("start to init sqlite")
+	slog.Info("start to init sqlite")
+	defer slog.Info("success init sqlite")
+
 	cfg := global.Config.Database.Sqlite
 	db, err := gorm.Open(sqlite.Open(cfg.Path), &gorm.Config{})
 	if err != nil {
-		global.Logger.Error("failed to init sqlite", zap.Error(err))
+		slog.Error("failed to init sqlite", slog.String("err", err.Error()))
 		panic(err)
 	}
-	global.Logger.Info("successfully connect to db", zap.String("path", cfg.Path))
+
 	return db
 }
 
 func initMysql() *gorm.DB {
-	global.Logger.Info("start to init mysql")
+	slog.Info("start to init mysql")
+	defer slog.Info("success init mysql")
+
 	m := global.Config.Database.Mysql
 	dsn := m.Dsn()
 	cfg := mysql.Config{
@@ -61,9 +71,9 @@ func initMysql() *gorm.DB {
 	}
 	db, err := gorm.Open(mysql.New(cfg))
 	if err != nil {
-		global.Logger.Error("failed to init mysql", zap.Error(err))
+		slog.Error("failed to init mysql", slog.String("err", err.Error()))
 		panic(err)
 	}
-	global.Logger.Info("successfully connect to db", zap.String("dsn", dsn))
+
 	return db
 }

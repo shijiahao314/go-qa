@@ -1,27 +1,34 @@
 package bootstrap
 
 import (
+	"log/slog"
+
 	"github.com/shijiahao314/go-qa/global"
-	"github.com/shijiahao314/go-qa/helper"
-	"go.uber.org/zap"
 )
 
-// 必须初始化
+// MustInit 初始化必要配置，如果失败将 panic
 func MustInit() {
-	// 初始化配置文件（首先）
-	InitViper()
-	// 初始化Logger
-	global.Logger = initZap()
-	// 初始化DB
-	global.DB = initDB()
-	// 初始化Redis
-	global.Redis = initRedis()
-	// 初始化casbin
-	global.Enforcer = initEnforcer()
-	// 初始化etcd
-	// global.Etcd = initEtcd()
+	slog.Info("start to setup must init")
+	defer slog.Info("success setup must init")
 
-	// setup success info
-	global.Logger.Info("success setup",
-		zap.String("global.Mode", string(helper.GetMode())))
+	// 初始化配置文件（首先）
+	mustInitViper()
+	// 初始化 Logger
+	global.Logger = mustInitZap()
+	// 初始化 DB
+	global.DB = mustInitDB()
+	// 初始化 Casbin
+	global.Enforcer = mustInitCasbin()
+}
+
+// Init 初始化可选配置
+func Init() {
+	slog.Info("start to setup init")
+	defer slog.Info("finish setup init")
+
+	// 初始化 Redis
+	redis, err := initRedis()
+	if err != nil {
+		global.Redis = redis
+	}
 }
