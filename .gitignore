@@ -84,6 +84,3 @@ Thumbs.db
 
 config.*.yaml
 !config.example.yaml
-
-# bin file
-*/*
