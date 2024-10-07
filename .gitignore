@@ -82,7 +82,6 @@ Thumbs.db
 
 # End of gitignore
 
-.vscode/launch.json
 config.*.yaml
 !config.example.yaml
 
