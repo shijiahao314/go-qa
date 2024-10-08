@@ -19,16 +19,12 @@ func MustInit() {
 	global.DB = mustInitDB()
 	// 初始化 Casbin
 	global.Enforcer = mustInitCasbin()
+	// 初始化 Redis
+	global.Redis = mustInitRedis()
 }
 
 // Init 初始化可选配置
 func Init() {
 	slog.Info("start to setup init")
 	defer slog.Info("finish setup init")
-
-	// 初始化 Redis
-	redis, err := initRedis()
-	if err != nil {
-		global.Redis = redis
-	}
 }

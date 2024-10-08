@@ -1,3 +1,4 @@
+# 服务端口
 port: 8080
 
 # 后端验证
@@ -18,17 +19,17 @@ database:
     config: charset=utf8mb4&parseTime=True&loc=Local
     max-idle-conns: 10
     max-open-conns: 100
-    log-mode: ""
+    log-mode: ''
     log-zap: false
 
 redis:
   enable: true
   db: 0
   addr: 127.0.0.1:6379
-  password: ""
+  password: ''
   connection-num: 10
 
 oauth:
   github:
-    client-id: "xxx"
-    client-secret: "xxxxx"
+    client-id: 'xxx'
+    client-secret: 'xxxxx'

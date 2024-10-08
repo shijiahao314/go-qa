@@ -1,83 +1,61 @@
 package bootstrap
 
 import (
-	"crypto/rand"
 	"log/slog"
-	"math/big"
 
 	"github.com/boj/redistore"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/shijiahao314/go-qa/global"
 	"github.com/shijiahao314/go-qa/router"
 )
 
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}<>?/"
-
-// generateRandomString 生成随机字符串
-func generateRandomString(length int) (string, error) {
-	result := make([]byte, length)
-	charsetLength := big.NewInt(int64(len(charset)))
-
-	for i := 0; i < length; i++ {
-		// 从字符集中随机选择一个字符
-		index, err := rand.Int(rand.Reader, charsetLength)
-		if err != nil {
-			return "", err
-		}
-		result[i] = charset[index.Int64()]
-	}
-
-	return string(result), nil
-}
-
 const (
-	HealthPath      = "/api/health"
-	SecretKeyLength = 32
+	HealthPath = "/api/health"
+	SecretKey  = "95osj3fUD7fo0mlYdDbncXz4VD2igvf0"
 )
 
 // MustInitRouter 初始化路由配置
 func MustInitRouter() *gin.Engine {
 	r := gin.New()
 
-	secretKey, err := generateRandomString(SecretKeyLength)
+	// session 设置参考：https://www.cnblogs.com/taoxiaoxin/p/17991891
+	// 使用 Redis（适合多机部署）
+	if global.Redis == nil {
+		// Redis 不可用
+		slog.Error("multi mode requires redis")
+		panic("multi mode requires redis")
+	}
+
+	store, err := redis.NewStore(
+		global.Config.Redis.ConnectionNum,
+		"tcp",
+		global.Config.Redis.Addr,
+		global.Config.Redis.Password,
+		[]byte(SecretKey), // 多机部署使用同一个密钥
+	)
 	if err != nil {
-		slog.Error("failed to generate random string", slog.String("err", err.Error()))
+		slog.Error("failed to init redis", slog.String("err", err.Error()))
 		panic(err)
 	}
 
-	// session
-	var store sessions.Store
-	if global.Redis != nil {
-		// Redis 可用则使用
-		store, err := redis.NewStore(
-			global.Config.Redis.ConnectionNum,
-			"tcp",
-			global.Config.Redis.Addr,
-			global.Config.Redis.Password,
-			[]byte(secretKey),
-		)
-		if err != nil {
-			slog.Error("failed to init redis", slog.String("err", err.Error()))
-			panic(err)
-		}
-		_, rs := redis.GetRedisStore(store)
-
-		rs.SetSerializer(redistore.JSONSerializer{})
-
-		store.Options(sessions.Options{
-			Path:     "/",
-			MaxAge:   60 * 60 * 24,
-			Secure:   false,
-			HttpOnly: false,
-		})
-	} else {
-		// 如果无法使用 Redis 则使用 cookie
-		store = cookie.NewStore([]byte(secretKey))
+	// 设置序列化器，不设置会导致 gob 报错
+	err, rs := redis.GetRedisStore(store)
+	if err != nil {
+		slog.Error("failed to get redis store", slog.String("err", err.Error()))
+		panic(err)
 	}
+	rs.SetSerializer(redistore.JSONSerializer{})
+
+	store.Options(sessions.Options{
+		Path:     "/",
+		MaxAge:   60 * 60 * 24,
+		Secure:   false,
+		HttpOnly: false,
+	})
+
 	r.Use(sessions.Sessions("session", store))
 
 	r.Use(
