@@ -5,6 +5,9 @@ port: 8080
 token: token
 
 # 前端盐
+salt: nextqa-frontend-salt
+
+# 前端盐
 salt: salt
 database:
   type: mysql
@@ -23,10 +26,9 @@ database:
     log-zap: false
 
 redis:
-  enable: true
   db: 0
   addr: 127.0.0.1:6379
-  password: ''
+  password: 'qa-redis-password'
   connection-num: 10
 
 oauth:
